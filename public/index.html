@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simulado PMPA - Técnico em Enfermagem 2025</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3408/3408592.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Poppins', sans-serif; }
+
+        /* Gradients & Visuals */
+        .bg-main-gradient { background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); }
+        .text-gradient { background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .shadow-soft { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
+        .blur-content { filter: blur(6px); user-select: none; pointer-events: none; }
+        
+        /* Animations */
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .spinner-border { border-top-color: #4f46e5; animation: spinner 1s linear infinite; }
+        @keyframes spinner { 100% { transform: rotate(360deg); } }
+        
+        /* Chart Bars Animation */
+        .chart-bar { transition: height 1s ease-out; animation: growBar 1s ease-out forwards; }
+        @keyframes growBar { from { height: 0; } }
+
+        /* Premium Shine */
+        .premium-shine {
+            background: linear-gradient(45deg, #ffd700, #fff8db, #ffd700);
+            background-size: 200% 200%;
+            animation: shine 3s ease infinite;
+        }
+        @keyframes shine { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+
+        /* UI Utilities */
+        .option-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .transition-all { transition: all 0.2s ease-in-out; }
+        
+        /* Toast */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; pointer-events: none; }
+        .toast {
+            background: white; padding: 12px 24px; border-radius: 12px; margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease;
+            display: flex; align-items: center; gap: 12px; pointer-events: auto; border-left: 4px solid #4f46e5;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.success { border-left-color: #22c55e; }
+
+        /* Admin Grid */
+        .admin-input-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; }
+        .admin-input-item input { width: 100%; text-align: center; text-transform: uppercase; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: bold; color: #475569; }
+        .admin-input-item input:focus { border-color: #4f46e5; outline: none; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800 selection:bg-indigo-100 selection:text-indigo-700">
+
+    <!-- NOTIFICATIONS -->
+    <div id="toast-container"></div>
+
+    <!-- HEADER -->
+    <header class="fixed w-full top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-sm transition-all">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition" onclick="location.reload()">
+                <div class="w-8 h-8 rounded-lg bg-main-gradient flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <i class="fas fa-heartbeat text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold leading-none text-slate-800 tracking-tight">Simulado PMPA</h1>
+                    <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Enfermagem 2025</p>
+                </div>
+                <span id="user-badge" class="ml-2 text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full border border-slate-200 transition-colors">FREE</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button id="btn-install-app" onclick="app.installPWA()" class="hidden md:flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition">
+                    <i class="fas fa-download"></i> App
+                </button>
+
+                <div id="credits-display" class="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs font-semibold text-slate-600">
+                        <span id="credits-count" class="text-indigo-600 font-bold">--</span>/2 Grátis
+                    </span>
+                </div>
+                
+                <div id="progress-container" class="hidden w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-main-gradient rounded-full transition-all duration-500 w-0"></div>
+                </div>
+
+                <!-- Botão Logout -->
+                <button id="btn-logout" onclick="app.logout()" class="hidden text-slate-400 hover:text-red-500 transition p-2" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="h-16"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl relative z-0">
+        
+        <!-- VIEW 1: DASHBOARD -->
+        <div id="start-screen" class="animate-fade-in-up">
+            
+            <!-- Hero Card -->
+            <div class="relative bg-white rounded-3xl p-8 md:p-12 shadow-soft border border-slate-100 overflow-hidden mb-6">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 -translate-y-1/2 translate-x-1/2"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="text-center md:text-left max-w-lg w-full">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold mb-4 border border-indigo-100">
+                            <i class="fas fa-star text-yellow-400"></i> Edital 122/2025
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight font-heading">
+                            Sua Aprovação <span class="text-gradient">Começa Aqui.</span>
+                        </h2>
+                        <p class="text-slate-600 mb-8 leading-relaxed">
+                            Plataforma de treino intensivo com Ranking Global, I.A. e questões focadas no Instituto Avalia.
+                        </p>
+
+                        <!-- ID Card / Profile Section -->
+                        <div id="id-card" class="bg-white/80 backdrop-blur border border-slate-200 p-4 rounded-2xl shadow-sm max-w-sm mx-auto md:mx-0 transition-all duration-500 relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-4 relative z-10">
+                                <div>
+                                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-colors" id="id-card-label">CARTÃO DE ACESSO</div>
+                                    <!-- NOVA SAUDAÇÃO -->
+                                    <div id="user-greeting" class="text-sm font-bold text-slate-700 mt-1">Olá, Visitante!</div>
+                                </div>
+                                <!-- AVATAR CONTAINER -->
+                                <div id="user-avatar-container">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden ID Info -->
+                            <div class="hidden text-xs font-mono text-slate-300 mb-2" id="user-uid">ID: ...</div>
+                            
+                            <div class="relative z-10 group">
+                                <input type="text" id="username" placeholder="Crie seu Apelido..." maxlength="15" 
+                                    class="w-full pl-4 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none font-semibold text-slate-700 text-sm transition-all">
+                            </div>
+                            <div class="flex justify-between items-center mt-3 relative z-10">
+                                <button onclick="app.openAuthModal()" id="btn-auth-text" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition underline flex items-center gap-1">
+                                    <i class="fas fa-sign-in-alt"></i> Entrar / Criar Conta
+                                </button>
+                                <span id="auth-status" class="text-[10px] font-medium text-slate-400 flex items-center gap-1">
+                                    <i class="fas fa-circle-notch fa-spin"></i> Visitante
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Visual -->
+                    <div class="hidden md:block relative">
+                        <div class="w-72 h-80 bg-gradient-to-b from-slate-50 to-slate-100 rounded-2xl border border-slate-200 flex flex-col items-center justify-center p-6 text-center shadow-sm relative z-10 hover:shadow-md transition">
+                            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mb-4 text-3xl animate-bounce">🏆</div>
+                            <h3 class="font-bold text-slate-800 text-lg">Top 100</h3>
+                            <p class="text-xs text-slate-500 mb-6">Dispute com os melhores</p>
+                            <button onclick="app.openLeaderboard()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition underline decoration-2 decoration-indigo-200 underline-offset-4">Ver Ranking →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS DASHBOARD -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-slate-800 font-heading flex items-center gap-2">
+                        <i class="fas fa-chart-line text-indigo-500"></i> Sua Evolução
+                    </h3>
+                    <span class="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded">Últimos resultados</span>
+                </div>
+                <div class="flex items-end gap-2 h-32 border-b border-slate-200 pb-2" id="stats-chart">
+                    <div class="w-full h-full flex items-center justify-center text-slate-400 text-xs">Faça seu primeiro simulado para ver dados.</div>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50 p-3 rounded-xl">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold">Média Geral</div>
+                        <div class="text-xl font-bold text-slate-700" id="stats-avg">--%</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl relative overflow-hidden group">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold">Ponto Fraco</div>
+                        <div class="text-sm font-bold text-red-500 truncate" id="stats-weak"><span class="filter blur-sm select-none">Bloqueado</span></div>
+                        <div id="stats-lock" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center cursor-pointer hover:bg-white/80 transition" onclick="app.showUpgradeModal()">
+                            <i class="fas fa-lock text-yellow-500 mr-1"></i> <span class="text-[10px] font-bold text-yellow-600">PREMIUM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mb-6">
+                <button id="btn-start" onclick="app.startQuiz()" class="flex-1 sm:flex-none bg-main-gradient hover:shadow-lg hover:shadow-indigo-500/30 text-white font-bold py-3.5 px-8 rounded-xl transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    <i class="fas fa-play"></i> Iniciar Simulado
+                </button>
+                <button onclick="app.openComparisonModal()" class="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-bold py-3.5 px-8 rounded-xl transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-table"></i> Comparar Planos
+                </button>
+                <button id="btn-upgrade" onclick="app.showUpgradeModal()" class="flex-1 sm:flex-none bg-yellow-50 border border-yellow-200 text-yellow-700 hover:bg-yellow-100 font-bold py-3.5 px-8 rounded-xl transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-crown"></i> Seja Premium
+                </button>
+            </div>
+
+            <p id="limit-warning" class="hidden mt-4 text-center md:text-left text-xs font-bold text-red-500 bg-red-50 inline-block px-3 py-1 rounded-lg border border-red-100 animate-pulse">
+                <i class="fas fa-exclamation-circle mr-1"></i> Limite diário atingido. Volte amanhã.
+            </p>
+
+            <!-- Real Exam Card -->
+            <div onclick="app.openRealExamCorrection()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group relative overflow-hidden mt-8">
+                <div class="flex items-center justify-between relative z-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center"><i class="fas fa-file-signature"></i></div>
+                        <div class="text-left">
+                            <h4 class="font-bold text-slate-800 group-hover:text-teal-600 transition">Correção da Prova Real</h4>
+                            <p class="text-xs text-slate-500">Gabarito Extra-Oficial (21/12)</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-lock text-slate-300 group-hover:text-teal-500 transition" id="real-exam-lock"></i>
+                </div>
+            </div>
+
+            <!-- Admin Trigger -->
+            <div class="mt-12 text-center" id="admin-panel-trigger" style="display:none;"> 
+                <button onclick="app.openAdminLoginModal()" class="text-[10px] text-slate-300 hover:text-slate-500 transition uppercase tracking-widest">Acesso Administrativo</button>
+            </div>
+        </div>
+
+        <!-- VIEW 2: QUIZ -->
+        <div id="quiz-screen" class="hidden flex flex-col min-h-[70vh] animate-fade-in-up">
+            <div class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden flex-grow relative">
+                <div id="loading-overlay" class="absolute inset-0 bg-white/90 z-20 hidden flex-col items-center justify-center backdrop-blur-sm">
+                    <div class="spinner-border w-12 h-12 border-4 rounded-full text-indigo-600 mb-4"></div>
+                    <p class="text-slate-600 font-medium text-sm">Gerando prova com I.A...</p>
+                </div>
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <span id="question-category" class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">...</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400">Peso</span>
+                        <span id="question-weight" class="text-xs font-bold bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-600">1.0</span>
+                    </div>
+                </div>
+                <div class="p-6 md:p-10">
+                    <h3 id="question-text" class="text-lg md:text-xl font-semibold text-slate-800 leading-relaxed mb-8 font-heading">...</h3>
+                    <div id="options-container" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+                <button id="prev-btn" onclick="app.prevQuestion()" class="hidden text-slate-500 hover:text-indigo-600 font-medium px-6 py-3 rounded-xl hover:bg-white transition-colors text-sm w-full sm:w-auto shadow-sm"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+                <div class="flex gap-3 w-full sm:w-auto justify-end">
+                    <button onclick="app.showJumpMenu()" class="bg-white text-slate-600 hover:text-indigo-600 font-bold px-4 py-3 rounded-xl shadow-sm border border-slate-200 transition w-full sm:w-auto"><i class="fas fa-th-large"></i></button>
+                    <button id="next-btn" onclick="app.nextQuestion()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">Próxima <i class="fas fa-arrow-right"></i></button>
+                    <button id="finish-btn" onclick="app.finishQuiz()" class="hidden flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">Finalizar <i class="fas fa-check"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: RESULTS -->
+        <div id="result-screen" class="hidden space-y-8 pb-12 animate-fade-in-up">
+            <div class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden relative">
+                <div class="bg-main-gradient p-10 text-white text-center relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+                    <h2 class="text-sm uppercase tracking-widest font-semibold opacity-80 mb-4">Desempenho Final</h2>
+                    <div class="flex justify-center items-baseline gap-2 mb-6">
+                        <span id="final-score" class="text-7xl font-extrabold tracking-tighter font-heading">0</span>
+                        <span class="text-2xl opacity-70 font-light">/ <span id="total-points">80</span></span>
+                    </div>
+                    <div id="criteria-container" class="flex justify-center gap-2 flex-wrap text-xs relative z-10"></div>
+                </div>
+                <div class="p-6 bg-slate-50 flex justify-center gap-4 border-t border-slate-100">
+                    <button onclick="app.openLeaderboard()" class="bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 font-bold py-3 px-6 rounded-xl shadow-sm flex gap-2"><i class="fas fa-trophy text-yellow-500"></i> Ranking</button>
+                    <button onclick="app.startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center gap-2"><i class="fas fa-redo"></i> Tentar Novamente</button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-200 mb-6 overflow-x-auto gap-6 px-2">
+                <button onclick="app.switchTab('review')" id="tab-btn-review" class="pb-3 text-indigo-600 border-b-2 border-indigo-600 font-bold focus:outline-none transition-colors whitespace-nowrap">Gabarito & Revisão</button>
+                <button onclick="app.switchTab('discursive')" id="tab-btn-discursive" class="pb-3 text-slate-400 hover:text-yellow-600 border-b-2 border-transparent hover:border-yellow-400 font-medium focus:outline-none transition-colors whitespace-nowrap hidden flex items-center gap-2"><i class="fas fa-pen-nib"></i> Discursiva (Aprovado)</button>
+            </div>
+
+            <div id="tab-review" class="tab-content">
+                <div class="flex gap-2 mb-6 justify-end">
+                    <button onclick="app.filterReview('all')" class="px-4 py-1.5 text-xs rounded-full bg-white border border-slate-200 hover:bg-slate-50 font-medium transition shadow-sm text-slate-600">Todas</button>
+                    <button onclick="app.filterReview('wrong')" class="px-4 py-1.5 text-xs rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 font-medium transition shadow-sm">Apenas Erros</button>
+                </div>
+                <div id="review-container" class="space-y-4"></div>
+                
+                <div id="review-premium-block" class="hidden mt-8 p-8 bg-slate-800 rounded-2xl text-center text-white shadow-xl relative overflow-hidden group cursor-pointer" onclick="app.showUpgradeModal()">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition"></div>
+                    <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"><i class="fas fa-lock text-3xl text-white/80"></i></div>
+                    <h3 class="text-xl font-bold mb-2 font-heading">Comentários Bloqueados</h3>
+                    <p class="text-slate-300 mb-6 max-w-md mx-auto text-sm">Exclusivo para Premium.</p>
+                    <button class="bg-white text-slate-900 font-bold py-3 px-8 rounded-xl hover:bg-indigo-50 transition shadow-lg">Desbloquear Agora</button>
+                </div>
+            </div>
+
+            <div id="tab-discursive" class="tab-content hidden">
+                <div class="bg-white rounded-3xl shadow-soft border border-yellow-100 p-8 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-6"><div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center text-yellow-600"><i class="fas fa-pen-alt"></i></div><h3 class="font-bold text-xl text-slate-800 font-heading">Estudo de Caso Clínico</h3></div>
+                        <div class="prose prose-slate max-w-none mb-8"><p id="discursive-text" class="text-slate-700 leading-relaxed font-serif text-lg italic bg-slate-50 p-6 rounded-xl border-l-4 border-indigo-500"></p></div>
+                        <details class="group bg-emerald-50 rounded-xl border border-emerald-100 overflow-hidden">
+                            <summary class="flex justify-between items-center font-bold cursor-pointer list-none bg-emerald-100/50 text-emerald-800 px-6 py-4 hover:bg-emerald-100 transition-colors"><span>Ver Espelho de Correção</span><i class="fas fa-chevron-down transition group-open:rotate-180"></i></summary>
+                            <div class="p-6 text-slate-700 text-sm leading-relaxed border-t border-emerald-100 bg-white/50"><p id="discursive-answer" class="whitespace-pre-line"></p></div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODALS CONTAINER -->
+    
+    <!-- Comparison Modal -->
+    <div id="comparison-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col animate-fade-in-up overflow-hidden border border-slate-200">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-xl text-slate-800 font-heading"><i class="fas fa-table text-indigo-500 mr-2"></i>Comparativo de Planos</h3>
+                <button onclick="app.closeComparisonModal()" class="w-8 h-8 bg-white rounded-full text-slate-400 hover:text-red-500 shadow-sm flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-0 overflow-y-auto flex-grow">
+                <table class="w-full text-sm text-left text-slate-600">
+                    <thead class="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0 z-10">
+                        <tr><th class="px-6 py-4 font-bold">Recurso</th><th class="px-6 py-4 text-center">Free</th><th class="px-6 py-4 text-center bg-yellow-50 text-yellow-800 border-b-2 border-yellow-400">Premium 👑</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Simulados Diários</td><td class="px-6 py-4 text-center">Limitado a 2</td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30">Ilimitado</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Ranking Global</td><td class="px-6 py-4 text-center">Apenas Posição</td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30">Top 100 Completo</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Gabarito</td><td class="px-6 py-4 text-center">Simples</td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30">Comentado Detalhado</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Questão Discursiva</td><td class="px-6 py-4 text-center text-red-400"><i class="fas fa-times"></i></td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30"><i class="fas fa-check"></i></td></tr>
+                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Correção Prova Real (21/12)</td><td class="px-6 py-4 text-center text-red-400"><i class="fas fa-times"></i></td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30"><i class="fas fa-check"></i></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-6 bg-slate-50 border-t border-slate-200 text-center">
+                <button onclick="app.showUpgradeModal()" class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-3 px-12 rounded-xl shadow-lg transition-all transform hover:-translate-y-1">Quero Ser Premium Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jump Menu -->
+    <div id="jump-menu" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col animate-fade-in-up overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-slate-800">Navegação Rápida</h3>
+                <button onclick="app.closeJumpMenu()" class="w-8 h-8 bg-slate-100 rounded-full text-slate-500 flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="jump-grid" class="p-6 overflow-y-auto grid grid-cols-5 sm:grid-cols-10 gap-3 bg-slate-50/50"></div>
+        </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div id="upgrade-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full animate-fade-in-up overflow-hidden border-4 border-white relative">
+            <div class="bg-main-gradient p-8 text-center text-white relative overflow-hidden">
+                <button onclick="document.getElementById('upgrade-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white/70 hover:text-white transition"><i class="fas fa-times"></i></button>
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/30 shadow-lg"><i class="fas fa-crown text-3xl text-yellow-300 drop-shadow-sm"></i></div>
+                <h3 class="text-2xl font-bold font-heading">Plano Premium</h3>
+                <p class="text-indigo-100 text-sm mt-1">Desbloqueie sua aprovação</p>
+            </div>
+            <div class="p-8">
+                <div class="text-center mb-6">
+                    <span class="text-sm text-slate-400 line-through">R$ 49,90</span>
+                    <div class="flex items-baseline justify-center gap-1 text-slate-800">
+                        <span class="text-lg font-medium">R$</span><span class="text-5xl font-bold tracking-tight">19,90</span><span class="text-sm text-slate-500">/único</span>
+                    </div>
+                </div>
+                <ul class="space-y-3 text-sm text-slate-600 mb-8">
+                    <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-500 text-lg"></i> <span>Simulados <strong>Ilimitados</strong></span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-500 text-lg"></i> <span>Ranking <strong>Global Completo</strong></span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-500 text-lg"></i> <span>Gabarito <strong>Comentado</strong></span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-500 text-lg"></i> <span>Correção <strong>Prova Real (21/12)</strong></span></li>
+                </ul>
+                <button onclick="app.openCheckout()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">Quero Ser Premium <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fade-in flex flex-col overflow-hidden h-[500px]">
+            <div class="bg-slate-50 p-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-lock text-green-500 mr-2"></i> Checkout Seguro</h3>
+                <button onclick="app.closeCheckout()" class="text-slate-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="pay-pix" class="p-8 flex flex-col items-center justify-center flex-grow text-center space-y-6">
+                <div class="spinner-border w-12 h-12 border-4 rounded-full text-indigo-600"></div>
+                <p class="text-slate-500 font-medium">Gerando seu PIX exclusivo...</p>
+            </div>
+            <div id="payment-success" class="absolute inset-0 bg-emerald-500 z-20 hidden flex-col items-center justify-center text-center p-8 text-white animate-fade-in">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-2xl animate-bounce"><i class="fas fa-check text-5xl text-emerald-500"></i></div>
+                <h3 class="font-bold text-3xl mb-2 font-heading">Sucesso!</h3>
+                <p class="text-emerald-100 mb-8 text-lg">Você agora é um membro Premium.</p>
+                <button onclick="app.finishUpgrade()" class="bg-white text-emerald-600 font-bold py-3 px-10 rounded-full shadow-xl hover:bg-emerald-50 transition transform hover:scale-105">Acessar Plataforma</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col animate-fade-in border border-slate-200 overflow-hidden relative">
+            <div class="p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <div><h3 class="font-bold text-xl text-slate-800 font-heading"><i class="fas fa-trophy text-yellow-500 mr-2"></i>Ranking Global</h3><p class="text-xs text-slate-500">Top 100 Melhores Notas</p></div>
+                <button onclick="app.closeLeaderboard()" class="w-8 h-8 bg-white rounded-full text-slate-400 hover:text-red-500 shadow-sm flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="leaderboard-content" class="p-0 overflow-y-auto flex-grow bg-white relative min-h-[300px]">
+                <div class="p-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-3xl mb-2 text-indigo-500"></i><br>Carregando dados...</div>
+            </div>
+            <div id="leaderboard-locked-overlay" class="absolute inset-0 top-[80px] bg-white/60 backdrop-blur-md z-10 hidden flex-col items-center justify-center text-center p-8">
+                <div class="bg-white p-8 rounded-3xl shadow-2xl border border-yellow-100 max-w-xs relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-yellow-400"></div>
+                    <i class="fas fa-lock text-5xl text-yellow-400 mb-4 drop-shadow-sm"></i>
+                    <h4 class="font-bold text-slate-800 text-xl mb-2 font-heading">Ranking Bloqueado</h4>
+                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Apenas membros Premium podem ver a lista completa e comparar estratégias.</p>
+                    <button onclick="app.showUpgradeModal()" class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-indigo-700 transition">Liberar Agora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal (Login/Register) - NOW WITH GOOGLE -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[90] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-600">
+                    <i class="fas fa-user-shield text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 font-heading">Identifique-se</h3>
+                <p class="text-xs text-slate-400 mt-1">Para salvar seu progresso e controlar o limite.</p>
+            </div>
+            
+            <!-- Google Button -->
+            <button onclick="app.handleGoogleLogin()" class="w-full bg-white border border-slate-300 text-slate-700 font-bold py-3 rounded-lg hover:bg-slate-50 transition flex items-center justify-center gap-3 mb-6 shadow-sm">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Continuar com Google
+            </button>
+
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">Ou com e-mail</span></div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-200 mb-4">
+                <button onclick="app.switchAuthMode('login')" id="auth-tab-login" class="flex-1 pb-2 text-indigo-600 border-b-2 border-indigo-600 font-bold text-sm">Entrar</button>
+                <button onclick="app.switchAuthMode('register')" id="auth-tab-register" class="flex-1 pb-2 text-slate-400 border-b-2 border-transparent font-medium text-sm">Criar Conta</button>
+            </div>
+
+            <div class="space-y-3">
+                <input type="email" id="auth-email" placeholder="Seu melhor e-mail" class="w-full border border-slate-300 bg-slate-50 p-3 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                <input type="password" id="auth-pass" placeholder="Senha segura" class="w-full border border-slate-300 bg-slate-50 p-3 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                
+                <button id="btn-auth-action" onclick="app.handleAuth()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition shadow-lg mt-2">
+                    Entrar no Sistema
+                </button>
+                <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="w-full text-slate-400 text-xs hover:text-slate-600 mt-3">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[90] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-600"><i class="fas fa-shield-alt text-3xl"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 font-heading">Acesso Restrito</h3>
+            </div>
+            <div class="space-y-3">
+                <input type="email" id="admin-email" placeholder="E-mail Administrativo" class="w-full border border-slate-300 bg-slate-50 p-3 rounded-lg text-sm focus:ring-2 focus:ring-slate-500 outline-none">
+                <input type="password" id="admin-pass" placeholder="Senha" class="w-full border border-slate-300 bg-slate-50 p-3 rounded-lg text-sm focus:ring-2 focus:ring-slate-500 outline-none">
+                <button onclick="app.handleAdminLogin()" class="w-full bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Entrar</button>
+                <button onclick="document.getElementById('admin-login-modal').classList.add('hidden')" class="w-full text-slate-400 text-xs hover:text-slate-600 mt-3 block text-center">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold flex items-center gap-2"><i class="fas fa-key text-yellow-400"></i> Gabarito Oficial</h3>
+                <div class="flex gap-3"><button onclick="app.logout()" class="text-xs bg-red-500/20 text-red-300 hover:text-white px-3 py-1.5 rounded border border-red-500/30 transition">Sair</button><button onclick="document.getElementById('admin-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button></div>
+            </div>
+            <div class="p-8 overflow-y-auto bg-slate-50 flex-grow"><div id="admin-grid" class="admin-input-grid"></div></div>
+            <div class="p-6 bg-white border-t border-slate-200 flex justify-end"><button onclick="app.saveOfficialKey()" class="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 shadow-lg">Publicar</button></div>
+        </div>
+    </div>
+
+    <!-- Real Exam Correction -->
+    <div id="real-exam-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
+            <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-6 flex justify-between items-center">
+                <div><h3 class="font-bold text-xl font-heading">Correção Prova Real</h3><p class="text-sm text-emerald-100">Insira suas respostas do dia 21/12</p></div>
+                <button onclick="document.getElementById('real-exam-modal').classList.add('hidden')" class="w-8 h-8 bg-white/20 rounded-full hover:bg-white/30 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="real-exam-content" class="flex-grow overflow-y-auto p-6 bg-slate-50">
+                <div id="real-exam-loading" class="text-center py-20"><div class="spinner-border w-16 h-16 border-4 rounded-full text-teal-500 mb-6 mx-auto"></div><h4 class="font-bold text-slate-700">Verificando Gabarito...</h4></div>
+                <div id="real-exam-input" class="hidden"><div id="user-exam-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-3"></div></div>
+                <div id="real-exam-result" class="hidden text-center">
+                    <span class="text-xs uppercase font-bold text-slate-400 tracking-widest">Sua Nota Final</span>
+                    <div class="text-6xl font-extrabold text-slate-800 mt-2 font-heading" id="real-score-display">0.0</div>
+                    <div class="grid grid-cols-2 gap-4 max-w-lg mx-auto mt-6" id="real-breakdown"></div>
+                </div>
+            </div>
+            <div class="p-6 bg-white border-t border-slate-200 flex justify-end" id="real-exam-footer"><button onclick="app.calculateRealScore()" class="bg-teal-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-teal-700 shadow-lg transition transform hover:-translate-y-1">Calcular</button></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, addDoc, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Safety check for config
+        let firebaseConfig;
+        try {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } catch (e) {
+            console.warn("Firebase Config missing (Local Test Mode)");
+            firebaseConfig = { apiKey: "mock", authDomain: "mock", projectId: "mock" };
+        }
+
+        const appInstance = initializeApp(firebaseConfig);
+        const auth = getAuth(appInstance);
+        const db = getFirestore(appInstance);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const ADMIN_EMAIL = "tlopes.dev@gmail.com"; 
+
+        let currentUser = null;
+        let userProfile = { isPremium: false, dailyCount: 0, lastDate: "", history: [] };
+        let checkPaymentInterval = null;
+        let officialKeyData = null;
+        let authMode = 'login';
+
+        // AUTH INIT
+        async function initAuth() {
+             // No auto sign-in to force login for quiz start
+        }
+        initAuth();
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if(user) {
+                document.getElementById('user-uid').innerText = "ID: " + user.uid.substring(0, 6);
+                document.getElementById('auth-status').innerHTML = '<span class="text-emerald-500 font-bold flex items-center gap-1"><i class="fas fa-wifi text-[10px]"></i> Conectado</span>';
+                document.getElementById('btn-logout').classList.remove('hidden');
+                
+                if(user.displayName) {
+                    const greetingEl = document.getElementById('user-greeting');
+                    if (greetingEl) greetingEl.innerText = `Olá, ${user.displayName.split(' ')[0]}!`;
+                    
+                    const unameInput = document.getElementById('username');
+                    if (unameInput) {
+                        unameInput.value = user.displayName;
+                        unameInput.disabled = true;
+                    }
+                }
+                if(user.photoURL) {
+                    const avatarContainer = document.getElementById('user-avatar-container');
+                    if (avatarContainer) avatarContainer.innerHTML = `<img src="${user.photoURL}" class="w-10 h-10 rounded-full border border-indigo-200 object-cover">`;
+                }
+
+                await loadUserProfile();
+                const urlParams = new URLSearchParams(window.location.search);
+                if(urlParams.get('admin') === 'true') document.getElementById('admin-panel-trigger').classList.remove('hidden');
+            } else {
+                document.getElementById('user-uid').innerText = "ID: ...";
+                document.getElementById('auth-status').innerText = "Visitante";
+                document.getElementById('btn-logout').classList.add('hidden');
+                // Reset UI
+                const greetingEl = document.getElementById('user-greeting');
+                if (greetingEl) greetingEl.innerText = "Olá, Visitante!";
+                
+                const avatarContainer = document.getElementById('user-avatar-container');
+                if (avatarContainer) avatarContainer.innerHTML = '<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200"><i class="fas fa-user"></i></div>';
+                
+                const unameInput = document.getElementById('username');
+                if (unameInput) {
+                    unameInput.value = "";
+                    unameInput.disabled = false;
+                }
+                userProfile = { isPremium: false, dailyCount: 0 };
+                app.updateUI();
+            }
+        });
+
+        // HELPERS
+        const toast = (msg, type='success') => {
+            const el = document.createElement('div');
+            el.className = `toast ${type} show`;
+            el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} text-${type==='success'?'emerald-500':'red-500'}"></i> <span>${msg}</span>`;
+            document.getElementById('toast-container').appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        };
+        const escapeHtml = (u) => u ? u.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : "";
+
+        // PROFILE
+        async function loadUserProfile() {
+            if(!currentUser) return;
+            try {
+                const ref = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data');
+                const snap = await getDoc(ref);
+                const today = new Date().toISOString().split('T')[0];
+                if(snap.exists()) {
+                    userProfile = snap.data();
+                    if(userProfile.lastDate !== today) { 
+                        await updateDoc(ref, { dailyCount: 0, lastDate: today });
+                        userProfile.dailyCount = 0;
+                    }
+                } else {
+                    userProfile = { isPremium: false, dailyCount: 0, lastDate: today, history: [] };
+                    await setDoc(ref, userProfile);
+                }
+                app.updateUI(); app.updateStats();
+            } catch(e) { console.warn("Offline profile"); }
+        }
+
+        function updateUI() {
+            const p = userProfile.isPremium;
+            const badge = document.getElementById('user-badge');
+            const idCard = document.getElementById('id-card');
+            const idLabel = document.getElementById('id-card-label');
+            const credits = document.getElementById('credits-count');
+            const btnStart = document.getElementById('btn-start');
+            const realLock = document.getElementById('real-exam-lock');
+            
+            if(p) {
+                badge.innerText = "PRO"; badge.className = "ml-2 text-[10px] font-bold bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded shadow-sm ml-2";
+                document.getElementById('premium-cta-banner').classList.add('hidden');
+                document.getElementById('credits-display').classList.add('hidden');
+                document.getElementById('limit-warning').classList.add('hidden');
+                btnStart.disabled = false; btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
+                idCard.classList.remove('bg-white/80'); idCard.classList.add('premium-shine', 'border-yellow-400');
+                idLabel.innerText = "MEMBRO PREMIUM"; idLabel.className = "text-[10px] font-bold text-yellow-800 tracking-widest";
+                realLock.className = "fas fa-unlock text-teal-200";
+            } else {
+                badge.innerText = "FREE"; badge.className = "ml-2 text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded border border-slate-200";
+                document.getElementById('credits-display').classList.remove('hidden');
+                const rem = Math.max(0, 2 - (userProfile.dailyCount || 0));
+                credits.innerText = rem;
+                if(rem===0) { document.getElementById('limit-warning').classList.remove('hidden'); btnStart.disabled=true; btnStart.classList.add('opacity-50','cursor-not-allowed'); }
+                else { document.getElementById('limit-warning').classList.add('hidden'); btnStart.disabled=false; btnStart.classList.remove('opacity-50','cursor-not-allowed'); }
+                idCard.classList.add('bg-white/80'); idCard.classList.remove('premium-shine', 'border-yellow-400');
+                idLabel.innerText = "CARTÃO DE ACESSO"; idLabel.className = "text-[10px] font-bold text-slate-400 tracking-widest";
+                realLock.className = "fas fa-lock text-slate-300";
+            }
+        }
+
+        // QUIZ ENGINE
+        const state = { questions: [], answers: [], score: 0, questionIndex: 0 };
+        const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const staticPool = [
+            { c: "Língua Portuguesa", w: 1.0, t: "No trecho 'O técnico dirigiu-se **à** enfermaria', o uso do acento grave justifica-se por:", o: ["Ser facultativo.", "Fusão de preposição + artigo.", "Locução adverbial.", "Anteceder verbo."], a: 1, r: "Crase clássica: Verbo 'dirigir-se' exige 'a', e 'enfermaria' admite 'a'." },
+            { c: "Legislação", w: 0.5, t: "Data Magna de Porto Alegre (LOM):", o: ["20 de Setembro", "26 de Março", "15 de Novembro", "02 de Fevereiro"], a: 1, r: "Definida no Art. 4º da Lei Orgânica." }
+        ];
+
+        function generateProceduralQuestions() {
+            const pool = [];
+            const cats = ["Específicos", "Língua Portuguesa", "Legislação", "Informática", "Raciocínio Lógico"];
+            const weights = { "Língua Portuguesa": 1.0, "Raciocínio Lógico": 0.5, "Informática": 0.5, "Legislação": 0.5, "Específicos": 2.0 };
+
+            for(let i=0; i<58; i++) {
+                const cat = cats[i % 5];
+                let t, r, a;
+                
+                if(cat === "Raciocínio Lógico") {
+                    let x = rnd(2,9), y = rnd(2,5);
+                    t = `Qual o próximo número: ${x}, ${x+y}, ${x+y*2}...`;
+                    r = `PA de razão ${y}.`;
+                    a = 2; 
+                } else {
+                    t = `Questão Simulada ${i+1} - ${cat}`;
+                    r = "Explicação gerada automaticamente.";
+                    a = 0;
+                }
+                pool.push({c: cat, w: weights[cat], t, o: ["Alternativa A", "Alternativa B", "Alternativa C", "Alternativa D"], a: a, r: r});
+            }
+            return pool;
+        }
+
+        const discursivePool = [
+            {t: "Você está na equipe do SAMU e atende uma vítima de acidente motociclístico...", r: "Urgência e Emergência"},
+            {t: "Durante o banho no leito, um paciente idoso torna-se subitamente inconsciente...", r: "Urgência e Emergência"}
+            // ... (Full pool here in prod)
+        ];
+
+        // APP OBJECT
+        const app = {
+            updateUI: updateUI,
+            
+            updateStats: () => {
+                const history = userProfile.history || [];
+                const container = document.getElementById('stats-chart');
+                if(history.length > 0) {
+                    container.innerHTML = '';
+                    history.slice(-10).forEach(s => {
+                        const h = Math.max(s, 5);
+                        const bar = document.createElement('div');
+                        bar.className = `flex-1 ${s>=60?'bg-emerald-400':'bg-red-400'} rounded-t-md chart-bar relative group hover:opacity-80`;
+                        bar.style.height = `${h}%`;
+                        container.appendChild(bar);
+                    });
+                    const avg = Math.round(history.reduce((a,b)=>a+b,0)/history.length);
+                    document.getElementById('stats-avg').innerText = `${avg}%`;
+                }
+                if(userProfile.isPremium) {
+                    document.getElementById('stats-lock').classList.add('hidden');
+                    document.getElementById('stats-weak').innerHTML = "Em breve..."; 
+                    document.getElementById('stats-weak').classList.remove('filter', 'blur-sm');
+                } else {
+                    document.getElementById('stats-lock').classList.remove('hidden');
+                }
+            },
+
+            startQuiz: () => {
+                if(!currentUser) {
+                    app.openAuthModal();
+                    return;
+                }
+                
+                const name = document.getElementById('username').value.trim();
+                if(!name) return toast("Digite seu apelido", "error");
+                
+                if(!userProfile.isPremium && (userProfile.dailyCount || 0) >= 2) return app.showUpgradeModal();
+                
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+                document.getElementById('loading-overlay').classList.remove('hidden'); document.getElementById('loading-overlay').classList.add('flex');
+
+                setTimeout(() => {
+                    state.questions = [...staticPool, ...generateProceduralQuestions()].slice(0,60).map((q,i)=>({...q, id:i+1}));
+                    state.answers = new Array(60).fill(null);
+                    state.questionIndex = 0;
+                    document.getElementById('loading-overlay').classList.add('hidden'); document.getElementById('loading-overlay').classList.remove('flex');
+                    app.loadQuestion();
+                }, 1000);
+            },
+
+            loadQuestion: () => {
+                const q = state.questions[state.questionIndex];
+                document.getElementById('question-text').innerText = `${state.questionIndex+1}. ${q.t}`;
+                document.getElementById('question-category').innerText = q.c;
+                document.getElementById('question-weight').innerText = q.w;
+                const c = document.getElementById('options-container'); c.innerHTML = '';
+                q.o.forEach((opt, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = `card-hover w-full text-left p-4 rounded-xl border transition-all font-medium flex items-center gap-3 ${state.answers[state.questionIndex]===i ? 'bg-indigo-50 border-indigo-500 text-indigo-700 ring-1 ring-indigo-500' : 'bg-white border-slate-200 hover:border-indigo-300 text-slate-600'}`;
+                    btn.innerHTML = `<span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${state.answers[state.questionIndex]===i ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}">${String.fromCharCode(65+i)}</span> ${opt}`;
+                    btn.onclick = () => app.selectOption(i);
+                    c.appendChild(btn);
+                });
+                document.getElementById('progress-bar').style.width = `${((state.questionIndex+1)/60)*100}%`;
+                document.getElementById('prev-btn').classList.toggle('hidden', state.questionIndex === 0);
+                document.getElementById('next-btn').classList.toggle('hidden', state.questionIndex === 59);
+                document.getElementById('finish-btn').classList.toggle('hidden', state.questionIndex !== 59);
+            },
+
+            selectOption: (i) => { state.answers[state.questionIndex] = i; app.loadQuestion(); },
+            nextQuestion: () => { if(state.questionIndex < 59) { state.questionIndex++; app.loadQuestion(); window.scrollTo(0,0); }},
+            prevQuestion: () => { if(state.questionIndex > 0) { state.questionIndex--; app.loadQuestion(); }},
+            
+            finishQuiz: async () => {
+                if(!confirm("Entregar?")) return;
+                
+                // Increment limit atomically if free
+                if(!userProfile.isPremium) {
+                    try { await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { dailyCount: increment(1) }); userProfile.dailyCount++; } 
+                    catch(e){}
+                }
+                
+                state.score = 0; let max = 0;
+                let breakdown = { "Língua Portuguesa":0, "Específicos":0, "Legislação":0, "Informática":0, "Raciocínio Lógico":0 };
+                const rc = document.getElementById('review-container'); rc.innerHTML = '';
+                
+                state.questions.forEach((q, i) => {
+                    const cor = state.answers[i] === q.a;
+                    max += q.w;
+                    if(cor) { state.score += q.w; if(breakdown[q.c] !== undefined) breakdown[q.c] += q.w; }
+                    
+                    let comment = userProfile.isPremium 
+                        ? `<div class="mt-3 text-sm bg-emerald-50 text-emerald-800 p-3 rounded-lg border border-emerald-100">💡 ${q.r}</div>`
+                        : `<div class="mt-3 bg-slate-100 p-4 rounded-lg cursor-pointer group" onclick="app.showUpgradeModal()"><div class="blur-sm text-slate-400">Explicação Premium...</div></div>`;
+                    
+                    const card = document.createElement('div');
+                    card.className = `bg-white p-5 rounded-2xl border shadow-sm mb-4 ${cor?'border-emerald-200':'border-red-200'}`;
+                    card.innerHTML = `<div class="flex justify-between mb-2"><span class="text-xs font-bold uppercase text-slate-400">${q.c}</span> ${cor?'<span class="text-emerald-600 text-xs font-bold">Correto</span>':'<span class="text-red-500 text-xs font-bold">Errado</span>'}</div><p class="font-semibold text-slate-800 mb-2">${q.t}</p>${comment}`;
+                    rc.appendChild(card);
+                });
+
+                document.getElementById('final-score').innerText = state.score.toFixed(1);
+                document.getElementById('total-points').innerText = max.toFixed(1);
+                
+                // Stats update
+                const pct = Math.round((state.score / max) * 100);
+                if(!userProfile.history) userProfile.history = [];
+                userProfile.history.push(pct);
+                try { await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { history: userProfile.history }); } catch(e){}
+
+                // Discursive logic
+                if(userProfile.isPremium && breakdown["Específicos"] >= 30) {
+                    const dq = discursivePool[Math.floor(Math.random()*discursivePool.length)];
+                    document.getElementById('tab-btn-discursive').classList.remove('hidden');
+                    document.getElementById('discursive-text').innerText = dq.t;
+                    document.getElementById('discursive-answer').innerText = dq.r;
+                } else document.getElementById('tab-btn-discursive').classList.add('hidden');
+
+                if(!userProfile.isPremium) document.getElementById('review-premium-block').classList.remove('hidden');
+                else document.getElementById('review-premium-block').classList.add('hidden');
+
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.remove('hidden');
+
+                try { 
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard'), { 
+                        name: escapeHtml(document.getElementById('username').value), 
+                        uid: currentUser.uid, 
+                        photoURL: currentUser.photoURL, // SAVING PHOTO
+                        score: state.score, 
+                        breakdown, 
+                        isPremium: userProfile.isPremium 
+                    }); 
+                } catch(e){}
+                window.scrollTo(0,0);
+            },
+
+            openLeaderboard: async () => {
+                document.getElementById('leaderboard-modal').classList.remove('hidden');
+                const content = document.getElementById('leaderboard-content');
+                const overlay = document.getElementById('leaderboard-locked-overlay');
+                content.innerHTML = '<div class="p-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl text-indigo-500 mb-2"></i><br>Carregando...</div>';
+                
+                try {
+                    const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard'));
+                    let list = [];
+                    const currentName = document.getElementById('username').value;
+                    snap.forEach(d => { const val = d.data(); list.push({...val, isMe: (val.uid === currentUser?.uid || val.name === currentName)}); });
+                    
+                    list.sort((a, b) => {
+                        if (b.score !== a.score) return b.score - a.score;
+                        const order = ["Específicos", "Língua Portuguesa", "Legislação", "Informática", "Raciocínio Lógico"];
+                        for(let k of order) { 
+                            const diff = (b.breakdown?.[k]||0) - (a.breakdown?.[k]||0); 
+                            if(diff !== 0) return diff; 
+                        }
+                        return 0;
+                    });
+
+                    if (!userProfile.isPremium) {
+                        overlay.classList.remove('hidden'); overlay.classList.add('flex');
+                        content.innerHTML = list.slice(0, 15).map((s, i) => `
+                            <div class="flex justify-between items-center p-4 border-b border-slate-50 blur-sm opacity-40 select-none">
+                                <span>${i+1}º ${escapeHtml(s.name)}</span><span>${parseFloat(s.score).toFixed(1)}</span>
+                            </div>`).join('');
+                        const myRank = list.findIndex(x => x.isMe);
+                        if (myRank !== -1) {
+                            content.insertAdjacentHTML('afterbegin', `<div class="bg-indigo-50 p-4 border-b border-indigo-100 font-bold text-indigo-900 relative z-20">Sua Posição: #${myRank+1} (${parseFloat(list[myRank].score).toFixed(1)} pts)</div>`);
+                        }
+                    } else {
+                        overlay.classList.add('hidden'); overlay.classList.remove('flex');
+                        content.innerHTML = list.slice(0, 100).map((s, i) => {
+                           let icon = i<3 ? ['🥇','🥈','🥉'][i] : `<span class="text-slate-400 font-bold w-8 text-center">${i+1}</span>`;
+                           // PHOTO RENDER LOGIC
+                           let avatar = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 border border-slate-200">${s.name.substring(0,2).toUpperCase()}</div>`;
+                           if(s.photoURL) avatar = `<img src="${s.photoURL}" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="${s.name}">`;
+
+                           return `
+                            <div class="flex justify-between items-center p-4 border-b border-slate-50 ${s.isMe?'bg-indigo-50 border-l-4 border-indigo-500':''}"><div class="flex items-center gap-3">${icon} ${avatar} <span class="font-semibold text-slate-700">${escapeHtml(s.name)} ${s.isPremium?'<i class="fas fa-star text-yellow-400 text-xs"></i>':''}</span></div><div class="font-bold text-indigo-600">${parseFloat(s.score).toFixed(1)}</div></div>`;
+                        }).join('');
+                    }
+                } catch(e) { content.innerHTML = '<p class="p-8 text-center text-red-400">Erro ao carregar.</p>'; }
+            },
+            
+            openRealExamCorrection: () => {
+                const examDate = new Date('2025-12-21T00:00:00');
+                if (new Date() < examDate) return toast("Disponível em 21/12/2025", "error");
+                if (!userProfile.isPremium) return app.showUpgradeModal();
+                document.getElementById('real-exam-modal').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('real-exam-loading').classList.add('hidden');
+                    document.getElementById('real-exam-input').classList.remove('hidden');
+                    const grid = document.getElementById('user-exam-grid'); grid.innerHTML = '';
+                    for(let i=0; i<60; i++) {
+                        grid.innerHTML += `<div class="text-center"><div class="text-[10px] text-slate-400 mb-1 font-mono">Q${i+1}</div><select id="user-real-q-${i}" class="w-full border border-slate-200 rounded-lg p-1.5 text-sm font-bold text-center bg-white focus:border-indigo-500 outline-none"><option value="-">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select></div>`;
+                    }
+                }, 1000);
+            },
+            calculateRealScore: () => toast("Simulação de cálculo.", "success"),
+
+            // AUTH MODAL LOGIC
+            openAuthModal: (m='login') => {
+                document.getElementById('auth-modal').classList.remove('hidden');
+                app.switchAuthMode(m);
+            },
+            switchAuthMode: (mode) => {
+                authMode = mode;
+                const btn = document.getElementById('btn-auth-action');
+                const tabLogin = document.getElementById('auth-tab-login');
+                const tabRegister = document.getElementById('auth-tab-register');
+                
+                if(mode === 'login') {
+                    btn.innerText = "Entrar";
+                    tabLogin.classList.add('text-indigo-600', 'border-indigo-600');
+                    tabLogin.classList.remove('text-slate-400', 'border-transparent');
+                    tabRegister.classList.remove('text-indigo-600', 'border-indigo-600');
+                    tabRegister.classList.add('text-slate-400', 'border-transparent');
+                } else {
+                    btn.innerText = "Criar Conta";
+                    tabRegister.classList.add('text-indigo-600', 'border-indigo-600');
+                    tabRegister.classList.remove('text-slate-400', 'border-transparent');
+                    tabLogin.classList.remove('text-indigo-600', 'border-indigo-600');
+                    tabLogin.classList.add('text-slate-400', 'border-transparent');
+                }
+            },
+            handleAuth: async () => {
+                const email = document.getElementById('auth-email').value;
+                const pass = document.getElementById('auth-pass').value;
+                if(!email || !pass) return toast("Preencha os campos", "error");
+                
+                try {
+                    if(authMode === 'login') {
+                        await signInWithEmailAndPassword(auth, email, pass);
+                        toast("Login realizado!", "success");
+                    } else {
+                        await createUserWithEmailAndPassword(auth, email, pass);
+                        toast("Conta criada!", "success");
+                    }
+                    document.getElementById('auth-modal').classList.add('hidden');
+                } catch(e) {
+                    toast("Erro: " + e.message, "error");
+                }
+            },
+            handleGoogleLogin: async () => {
+                const provider = new GoogleAuthProvider();
+                try {
+                    await signInWithPopup(auth, provider);
+                    document.getElementById('auth-modal').classList.add('hidden');
+                    toast("Login Google OK!", "success");
+                } catch(e) {
+                    console.error(e);
+                    toast("Erro no login Google", "error");
+                }
+            },
+
+            // ADMIN
+            openAdminLoginModal: () => document.getElementById('admin-login-modal').classList.remove('hidden'),
+            handleAdminLogin: async () => {
+                const e = document.getElementById('admin-email').value;
+                const p = document.getElementById('admin-pass').value;
+                try {
+                    await signInWithEmailAndPassword(auth, e, p);
+                    if(e === ADMIN_EMAIL) { document.getElementById('admin-login-modal').classList.add('hidden'); app.openAdminPanel(); }
+                    else { alert("Negado"); app.logout(); }
+                } catch(e) { toast("Erro login", "error"); }
+            },
+            openAdminPanel: () => {
+                document.getElementById('admin-modal').classList.remove('hidden');
+                const grid = document.getElementById('admin-grid'); grid.innerHTML = '';
+                for(let i=1; i<=60; i++) grid.innerHTML += `<div class="admin-input-item"><div class="text-[10px] text-center">${i}</div><input type="text" id="adm-q-${i}" maxlength="1" class="w-full text-center border rounded" /></div>`;
+            },
+            saveOfficialKey: async () => {
+                let k = ""; for(let i=1;i<=60;i++) k += document.getElementById(`adm-q-${i}`).value.toUpperCase() || "-";
+                if(confirm("Publicar?")) { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'official_key_2025'), { key: k }); toast("Publicado!", "success"); document.getElementById('admin-modal').classList.add('hidden'); } catch(e){ toast("Erro", "error"); } }
+            },
+            logout: async () => { await signOut(auth); location.reload(); },
+            
+            // UI
+            closeLeaderboard: () => document.getElementById('leaderboard-modal').classList.add('hidden'),
+            showUpgradeModal: () => document.getElementById('upgrade-modal').classList.remove('hidden'),
+            openCheckout: () => { document.getElementById('upgrade-modal').classList.add('hidden'); document.getElementById('checkout-modal').classList.remove('hidden'); setTimeout(() => { document.getElementById('pay-pix').innerHTML = `<div class="bg-white p-3 border rounded shadow-sm mb-4"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Simulado" class="w-32 mx-auto"></div><p class="text-xs text-indigo-600 animate-pulse font-medium">Aguardando confirmação...</p>`; checkPaymentInterval = setTimeout(() => app.finishUpgrade(), 3000); }, 1500); },
+            closeCheckout: () => document.getElementById('checkout-modal').classList.add('hidden'),
+            finishUpgrade: async () => { if(checkPaymentInterval) clearTimeout(checkPaymentInterval); try { await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { isPremium: true }); userProfile.isPremium = true; document.getElementById('checkout-modal').classList.add('hidden'); document.getElementById('payment-success').classList.remove('hidden'); document.getElementById('payment-success').classList.add('flex'); setTimeout(() => { document.getElementById('payment-success').classList.add('hidden'); toast("Bem-vindo!", "success"); app.updateUI(); }, 2000); } catch(e){ toast("Erro ao salvar", "error"); } },
+            openComparisonModal: () => document.getElementById('comparison-modal').classList.remove('hidden'),
+            closeComparisonModal: () => document.getElementById('comparison-modal').classList.add('hidden'),
+            installPWA: async () => { if(window.deferredPrompt) window.deferredPrompt.prompt(); else toast("Instale via menu do navegador.", "error"); },
+            switchTab: (t) => { document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden'); document.querySelectorAll('button[id^="tab-btn-"]').forEach(b=>b.classList.remove('text-indigo-600', 'border-indigo-600')); document.getElementById(`tab-btn-${t}`).classList.add('text-indigo-600', 'border-indigo-600'); },
+            filterReview: (t) => { document.querySelectorAll('#review-container > div').forEach(d => { if(t==='all') d.classList.remove('hidden'); else if(t==='wrong') d.classList.contains('border-emerald-200') ? d.classList.add('hidden') : d.classList.remove('hidden'); }); },
+            showJumpMenu: () => document.getElementById('jump-menu').classList.remove('hidden'),
+            closeJumpMenu: () => document.getElementById('jump-menu').classList.add('hidden')
+        };
+
+        window.app = app;
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "Simulado PMPA - Técnico em Enfermagem 2025",
+  "short_name": "Simulado PMPA",
+  "description": "Plataforma de treino intensivo para o concurso da Prefeitura de Porto Alegre (Instituto Avalia). Ranking Global e Questões Dinâmicas.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3408/3408592.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3408/3408592.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/",
+  "lang": "pt-BR"
+}
