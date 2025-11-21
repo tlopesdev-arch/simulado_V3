@@ -1,5 +1,5 @@
-import { MercadoPagoConfig, Preference } from "mercadopago";
-import { initializeApp, cert, getApps } from "firebase-admin/app";
+const { MercadoPagoConfig, Preference } = require("mercadopago");
+const { initializeApp, cert, getApps } = require("firebase-admin/app");
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
@@ -14,7 +14,7 @@ if (!getApps().length) {
   }
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
@@ -69,4 +69,4 @@ export default async function handler(req, res) {
     console.error("Erro MercadoPago:", error);
     return res.status(500).json({ error: "Erro ao criar pagamento." });
   }
-}
+};
