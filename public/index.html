@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simulado PMPA - Técnico em Enfermagem 2025</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4f46e5">
-    
-    <!-- Assets -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3408/3408592.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
         
@@ -17,529 +21,203 @@
         h1, h2, h3, h4, .font-heading { font-family: 'Poppins', sans-serif; }
 
         .bg-main-gradient { background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); }
-        .text-gradient { background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .shadow-soft { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
-        
-        /* Flashcard Flip Animation */
-        .perspective { perspective: 1000px; }
-        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
-        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .flashcard-front { background-color: #ffffff; color: #1e293b; border: 1px solid #e2e8f0; }
-        .flashcard-back { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; transform: rotateY(180deg); }
-
-        /* Gauge Animation */
-        .gauge-fill { transition: stroke-dashoffset 1s ease-in-out; }
-        
-        .premium-shine { background: linear-gradient(45deg, #ffd700, #fff8db, #ffd700); background-size: 200% 200%; animation: shine 3s ease infinite; }
-        @keyframes shine { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
-        
-        /* Utilities */
         .blur-content { filter: blur(6px); user-select: none; pointer-events: none; }
         .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
         .spinner-border { border-top-color: #4f46e5; animation: spinner 1s linear infinite; }
         @keyframes spinner { 100% { transform: rotate(360deg); } }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.15); transition: all 0.3s ease; }
-        
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; }
-        .toast { background: white; padding: 12px 24px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-left: 4px solid #4f46e5; display: flex; gap: 12px; align-items: center; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        
-        /* Admin Grid */
+        .premium-shine { background: linear-gradient(45deg, #ffd700, #fff8db, #ffd700); background-size: 200% 200%; animation: shine 3s ease infinite; }
+        @keyframes shine { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+        .option-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .transition-all { transition: all 0.2s ease-in-out; }
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; pointer-events: none; }
+        .toast { background: white; padding: 12px 24px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease; display: flex; align-items: center; gap: 12px; pointer-events: auto; border-left: 4px solid #4f46e5; }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.success { border-left-color: #22c55e; }
         .admin-input-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; }
         .admin-input-item input { width: 100%; text-align: center; text-transform: uppercase; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: bold; color: #475569; }
-        .admin-input-item input:focus { border-color: #4f46e5; outline: none; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
 
     <div id="toast-container"></div>
 
-    <!-- HEADER -->
     <header class="fixed w-full top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="location.reload()">
-                <div class="w-8 h-8 rounded-lg bg-main-gradient flex items-center justify-center text-white shadow-lg">
-                    <i class="fas fa-heartbeat"></i>
-                </div>
-                <div>
-                    <h1 class="text-sm font-bold leading-none text-slate-800">Simulado PMPA</h1>
-                    <p class="text-[10px] font-medium text-slate-500 uppercase">Enfermagem</p>
-                </div>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
+                <div class="w-8 h-8 rounded-lg bg-main-gradient flex items-center justify-center text-white shadow-lg"><i class="fas fa-heartbeat"></i></div>
+                <div><h1 class="text-sm font-bold leading-none">Simulado PMPA</h1><p class="text-[10px] text-slate-500">Enfermagem 2025</p></div>
                 <span id="user-badge" class="ml-1 text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">FREE</span>
             </div>
             <div class="flex items-center gap-3">
+                <button id="btn-install-app" onclick="app.installPWA()" class="hidden md:flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition"><i class="fas fa-download"></i> App</button>
                 <div id="credits-display" class="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">
                     <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span class="text-xs font-semibold text-slate-600"><span id="credits-count">--</span></span>
+                    <span class="text-xs font-semibold"><span id="credits-count">--</span> <span id="credits-total">/1</span></span>
                 </div>
                 <button id="btn-logout" onclick="app.logout()" class="hidden text-slate-400 hover:text-red-500"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
-        <!-- Countdown Bar -->
-        <div class="bg-slate-900 text-white text-[10px] py-1 text-center font-mono tracking-widest" id="countdown-bar">
-            PROVA EM: <span id="countdown-timer" class="font-bold text-yellow-400">Calculando...</span>
-        </div>
+        <div class="bg-slate-900 text-white text-[10px] py-1 text-center font-mono tracking-widest">PROVA EM: <span id="countdown-timer" class="font-bold text-yellow-400">...</span></div>
     </header>
-
     <div class="h-20"></div>
 
     <main class="flex-grow container mx-auto px-4 py-6 max-w-5xl">
-        
-        <!-- VIEW 1: DASHBOARD -->
         <div id="start-screen" class="animate-fade-in-up">
-            
-            <!-- Hero Area -->
             <div class="relative bg-white rounded-3xl p-8 shadow-soft border border-slate-100 overflow-hidden mb-6">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70"></div>
-                
                 <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div class="text-center md:text-left max-w-lg w-full">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold mb-4 border border-indigo-100">Edital 122/2025</div>
-                        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2 font-heading">Sua Aprovação <span class="text-gradient">Começa Aqui.</span></h2>
-                        <p class="text-slate-600 mb-6 text-sm leading-relaxed">Plataforma completa com I.A., Flashcards e Ranking Global.</p>
-
-                        <!-- ID Card -->
+                        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2 font-heading">Sua Aprovação <span class="text-transparent bg-clip-text bg-main-gradient">Começa Aqui.</span></h2>
                         <div id="id-card" class="bg-slate-50 border border-slate-200 p-4 rounded-2xl shadow-sm max-w-sm mx-auto md:mx-0 relative overflow-hidden">
                             <div class="flex justify-between items-start mb-3">
                                 <div><div class="text-[10px] font-bold uppercase tracking-widest text-slate-400" id="id-card-label">PLANO GRATUITO</div><div id="user-greeting" class="text-sm font-bold text-slate-700 mt-1">Olá, Visitante!</div></div>
                                 <div id="user-avatar-container"><div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200"><i class="fas fa-user"></i></div></div>
                             </div>
-                            <div class="relative group"><input type="text" id="username" placeholder="Crie seu Apelido..." maxlength="15" class="w-full pl-4 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none"></div>
+                            <div class="relative group"><input type="text" id="username" placeholder="Crie seu Apelido..." maxlength="15" class="w-full pl-4 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-indigo-500 outline-none"></div>
                             <div class="flex justify-between items-center mt-2"><button onclick="app.openAuthModal()" class="text-[10px] font-bold text-indigo-600 hover:underline">Entrar / Criar Conta</button><span id="auth-status" class="text-[10px] text-slate-400"><i class="fas fa-circle-notch fa-spin"></i></span></div>
                         </div>
                     </div>
-
-                    <!-- PROBABILITY GAUGE -->
                     <div class="hidden md:block relative w-64">
                         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg text-center">
-                            <h3 class="text-xs font-bold text-slate-500 uppercase mb-4">Probabilidade de Aprovação</h3>
-                            <div class="relative w-32 h-32 mx-auto">
-                                <svg class="w-full h-full" viewBox="0 0 36 36">
-                                    <path class="text-slate-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8" />
-                                    <path id="gauge-path" class="text-indigo-500 gauge-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8" />
-                                </svg>
-                                <div class="absolute inset-0 flex items-center justify-center flex-col">
-                                    <span class="text-2xl font-bold text-slate-800" id="gauge-text">0%</span>
-                                    <span class="text-[9px] text-slate-400">Baseado em IA</span>
-                                </div>
-                            </div>
-                            <button onclick="app.showUpgradeModal()" class="mt-4 text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition">Aumentar Chances 🚀</button>
+                            <h3 class="text-xs font-bold text-slate-500 uppercase mb-4">Probabilidade</h3>
+                            <div class="relative w-32 h-32 mx-auto"><svg class="w-full h-full" viewBox="0 0 36 36"><path class="text-slate-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8"/><path id="gauge-path" class="text-indigo-500 transition-all duration-1000" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8"/></svg><div class="absolute inset-0 flex items-center justify-center flex-col"><span class="text-2xl font-bold text-slate-800" id="gauge-text">0%</span></div></div>
+                            <button onclick="app.showUpgradeModal()" class="mt-4 text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100">Aumentar 🚀</button>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Main Actions -->
                 <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start border-t border-slate-100 pt-6">
-                    <button onclick="app.startQuiz()" id="btn-start" class="bg-main-gradient text-white font-bold py-3.5 px-8 rounded-xl shadow-lg hover:shadow-indigo-500/30 transition transform hover:-translate-y-1 flex items-center justify-center gap-2"><i class="fas fa-play"></i> Iniciar Simulado</button>
-                    <button onclick="app.openFlashcards()" class="bg-white border border-slate-200 text-slate-700 font-bold py-3.5 px-8 rounded-xl hover:bg-slate-50 transition flex items-center justify-center gap-2"><i class="fas fa-layer-group text-indigo-500"></i> Flashcards <span class="text-[10px] bg-green-100 text-green-700 px-1.5 rounded ml-1">Novo</span></button>
+                    <button onclick="app.startQuiz()" id="btn-start" class="bg-main-gradient text-white font-bold py-3.5 px-8 rounded-xl shadow-lg hover:shadow-indigo-500/30 transition transform hover:-translate-y-1 flex items-center justify-center gap-2"><i class="fas fa-play"></i> Iniciar</button>
+                    <button onclick="app.openFlashcards()" class="bg-white border border-slate-200 text-slate-700 font-bold py-3.5 px-8 rounded-xl hover:bg-slate-50 transition flex items-center justify-center gap-2"><i class="fas fa-layer-group text-indigo-500"></i> Flashcards</button>
                     <button onclick="app.showUpgradeModal()" class="bg-yellow-50 border border-yellow-200 text-yellow-700 font-bold py-3.5 px-8 rounded-xl hover:bg-yellow-100 transition flex items-center justify-center gap-2"><i class="fas fa-crown"></i> Premium</button>
                 </div>
                 <p id="limit-warning" class="hidden mt-3 text-xs font-bold text-red-500 bg-red-50 inline-block px-3 py-1 rounded border border-red-100">Limite diário atingido.</p>
-                
-                <!-- Admin Trigger -->
-                <div class="mt-4 text-center" id="admin-panel-trigger" style="display:none;"> 
-                    <button onclick="app.openAdminLoginModal()" class="text-[10px] text-slate-300 hover:text-slate-500 transition uppercase tracking-widest">Acesso Administrativo</button>
-                </div>
+                <div class="mt-4 text-center" id="admin-panel-trigger" style="display:none;"><button onclick="app.openAdminLoginModal()" class="text-[10px] text-slate-300 hover:text-slate-500 transition uppercase tracking-widest">Acesso Administrativo</button></div>
             </div>
-
-            <!-- Secondary Feature Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div onclick="app.openRealExamCorrection()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group">
-                    <div class="mb-3 w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center"><i class="fas fa-file-signature"></i></div>
-                    <div><h4 class="font-bold text-slate-800 group-hover:text-teal-600 transition">Correção Real</h4><p class="text-xs text-slate-500">Gabarito Oficial (21/12)</p></div>
-                    <i class="fas fa-lock text-slate-300 group-hover:text-teal-500 absolute top-4 right-4" id="real-exam-lock"></i>
-                </div>
-                <div onclick="app.openLeaderboard()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between group">
-                    <div class="mb-3 w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-trophy"></i></div>
-                    <div><h4 class="font-bold text-slate-800 group-hover:text-blue-600 transition">Ranking Global</h4><p class="text-xs text-slate-500">Compare sua nota</p></div>
-                </div>
-                <div onclick="app.openComparisonModal()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between">
-                    <div class="mb-3 w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center"><i class="fas fa-table"></i></div>
-                    <div><h4 class="font-bold text-slate-800">Comparar Planos</h4><p class="text-xs text-slate-500">Veja benefícios</p></div>
-                </div>
+                <div onclick="app.openRealExamCorrection()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex justify-between items-center group"><div><h4 class="font-bold text-slate-800 group-hover:text-teal-600">Correção Real</h4><p class="text-xs text-slate-500">Gabarito (21/12)</p></div><i class="fas fa-lock text-slate-300 group-hover:text-teal-500" id="real-exam-lock"></i></div>
+                <div onclick="app.openLeaderboard()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex justify-between items-center group"><div><h4 class="font-bold text-slate-800 group-hover:text-blue-600">Ranking Global</h4><p class="text-xs text-slate-500">Compare notas</p></div><i class="fas fa-chart-bar text-blue-200 group-hover:text-blue-500"></i></div>
+                <div onclick="app.openComparisonModal()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex justify-between items-center"><div><h4 class="font-bold text-slate-800">Comparar</h4><p class="text-xs text-slate-500">Planos</p></div><i class="fas fa-table text-purple-200"></i></div>
             </div>
         </div>
 
-        <!-- VIEW 2: QUIZ -->
+        <!-- Quiz Screen -->
         <div id="quiz-screen" class="hidden flex flex-col min-h-[70vh] animate-fade-in-up">
             <div class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden flex-grow relative">
-                <div id="loading-overlay" class="absolute inset-0 bg-white/90 z-20 hidden flex-col items-center justify-center backdrop-blur-sm">
-                    <div class="spinner-border w-12 h-12 border-4 rounded-full text-indigo-600 mb-4"></div>
-                    <p class="text-slate-600 font-medium text-sm">Gerando prova com I.A...</p>
-                </div>
-                <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                    <span id="question-category" class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">...</span>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-slate-400">Peso</span>
-                        <span id="question-weight" class="text-xs font-bold bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-600">1.0</span>
-                    </div>
-                </div>
-                <div class="p-6 md:p-10">
-                    <h3 id="question-text" class="text-lg md:text-xl font-semibold text-slate-800 leading-relaxed mb-8 font-heading">...</h3>
-                    <div id="options-container" class="space-y-3"></div>
-                </div>
+                <div id="loading-overlay" class="absolute inset-0 bg-white/90 z-20 hidden flex-col items-center justify-center"><div class="spinner-border w-10 h-10 border-4 rounded-full text-indigo-600"></div></div>
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center"><span id="question-category" class="text-xs font-bold uppercase text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">...</span><span id="question-weight" class="text-xs font-bold bg-white border px-2 py-0.5 rounded">1.0</span></div>
+                <div class="p-6 md:p-10"><h3 id="question-text" class="text-lg font-medium text-slate-800 mb-6 font-heading leading-relaxed">...</h3><div id="options-container" class="space-y-3"></div></div>
             </div>
-
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
-                <button id="prev-btn" onclick="app.prevQuestion()" class="hidden text-slate-500 hover:text-indigo-600 font-medium px-6 py-3 rounded-xl hover:bg-white transition-colors text-sm w-full sm:w-auto shadow-sm"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
-                <div class="flex gap-3 w-full sm:w-auto justify-end">
-                    <button onclick="app.showJumpMenu()" class="bg-white text-slate-600 hover:text-indigo-600 font-bold px-4 py-3 rounded-xl shadow-sm border border-slate-200 transition w-full sm:w-auto"><i class="fas fa-th-large"></i></button>
-                    <button id="next-btn" onclick="app.nextQuestion()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">Próxima <i class="fas fa-arrow-right"></i></button>
-                    <button id="finish-btn" onclick="app.finishQuiz()" class="hidden flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">Finalizar <i class="fas fa-check"></i></button>
-                </div>
+            <div class="flex justify-between mt-6">
+                 <button onclick="app.prevQuestion()" id="prev-btn" class="text-slate-400 hover:text-slate-600 px-4 py-2 hidden"><i class="fas fa-arrow-left"></i> Anterior</button>
+                 <div class="flex gap-2 ml-auto"><button onclick="app.showJumpMenu()" class="bg-white border px-4 py-2 rounded text-slate-600 text-sm">Mapa</button><button onclick="app.nextQuestion()" id="next-btn" class="bg-indigo-600 text-white px-8 py-2 rounded-lg shadow hover:bg-indigo-700 font-bold">Próxima</button><button onclick="app.finishQuiz()" id="finish-btn" class="hidden bg-green-600 text-white px-8 py-2 rounded-lg shadow hover:bg-green-700 font-bold">Entregar</button></div>
             </div>
         </div>
 
-        <!-- VIEW 3: RESULTS -->
-        <div id="result-screen" class="hidden space-y-8 pb-12 animate-fade-in-up">
-            <!-- ... (Result Screen) ... -->
-            <div class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden relative">
-                <div class="bg-main-gradient p-10 text-white text-center relative overflow-hidden">
-                    <h2 class="text-sm uppercase tracking-widest font-semibold opacity-80 mb-4">Desempenho Final</h2>
-                    <div class="flex justify-center items-baseline gap-2 mb-6">
-                        <span id="final-score" class="text-7xl font-extrabold tracking-tighter font-heading">0</span>
-                        <span class="text-2xl opacity-70 font-light">/ <span id="total-points">80</span></span>
-                    </div>
-                    <div id="criteria-container" class="flex justify-center gap-2 flex-wrap text-xs relative z-10"></div>
-                </div>
-                <div class="p-6 bg-slate-50 flex justify-center gap-4 border-t border-slate-100">
-                    <button onclick="app.openLeaderboard()" class="bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 font-bold py-3 px-6 rounded-xl shadow-sm flex gap-2"><i class="fas fa-trophy text-yellow-500"></i> Ranking</button>
-                    <button onclick="app.startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center gap-2"><i class="fas fa-redo"></i> Tentar Novamente</button>
-                </div>
-            </div>
-
-            <!-- Tabs -->
-            <div class="flex border-b border-slate-200 mb-6 overflow-x-auto gap-6 px-2">
-                <button onclick="app.switchTab('review')" id="tab-btn-review" class="pb-3 text-indigo-600 border-b-2 border-indigo-600 font-bold focus:outline-none transition-colors whitespace-nowrap">Gabarito & Revisão</button>
-                <button onclick="app.switchTab('discursive')" id="tab-btn-discursive" class="pb-3 text-slate-400 hover:text-yellow-600 border-b-2 border-transparent hover:border-yellow-400 font-medium focus:outline-none transition-colors whitespace-nowrap hidden flex items-center gap-2"><i class="fas fa-pen-nib"></i> Discursiva (Aprovado)</button>
-            </div>
-
-            <div id="tab-review" class="tab-content">
-                <div class="flex gap-2 mb-6 justify-end">
-                    <button onclick="app.filterReview('all')" class="px-4 py-1.5 text-xs rounded-full bg-white border border-slate-200 hover:bg-slate-50 font-medium transition shadow-sm text-slate-600">Todas</button>
-                    <button onclick="app.filterReview('wrong')" class="px-4 py-1.5 text-xs rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 font-medium transition shadow-sm">Apenas Erros</button>
-                </div>
-                <div id="review-container" class="space-y-4"></div>
-                
-                <div id="review-premium-block" class="hidden mt-8 p-8 bg-slate-800 rounded-2xl text-center text-white shadow-xl relative overflow-hidden group cursor-pointer" onclick="app.showUpgradeModal()">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition"></div>
-                    <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm"><i class="fas fa-lock text-3xl text-white/80"></i></div>
-                    <h3 class="text-xl font-bold mb-2 font-heading">Comentários Bloqueados</h3>
-                    <p class="text-slate-300 mb-6 max-w-md mx-auto text-sm">Exclusivo para Premium.</p>
-                    <button class="bg-white text-slate-900 font-bold py-3 px-8 rounded-xl hover:bg-indigo-50 transition shadow-lg">Desbloquear Agora</button>
-                </div>
-            </div>
-
-            <div id="tab-discursive" class="tab-content hidden">
-                <div class="bg-white rounded-3xl shadow-soft border border-yellow-100 p-8 relative overflow-hidden">
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-3 mb-6"><div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center text-yellow-600"><i class="fas fa-pen-alt"></i></div><h3 class="font-bold text-xl text-slate-800 font-heading">Estudo de Caso Clínico</h3></div>
-                        <div class="prose prose-slate max-w-none mb-8"><p id="discursive-text" class="text-slate-700 leading-relaxed font-serif text-lg italic bg-slate-50 p-6 rounded-xl border-l-4 border-indigo-500"></p></div>
-                        <details class="group bg-emerald-50 rounded-xl border border-emerald-100 overflow-hidden">
-                            <summary class="flex justify-between items-center font-bold cursor-pointer list-none bg-emerald-100/50 text-emerald-800 px-6 py-4 hover:bg-emerald-100 transition-colors"><span>Ver Espelho de Correção</span><i class="fas fa-chevron-down transition group-open:rotate-180"></i></summary>
-                            <div class="p-6 text-slate-700 text-sm leading-relaxed border-t border-emerald-100 bg-white/50"><p id="discursive-answer" class="whitespace-pre-line"></p></div>
-                        </details>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- VIEW 4: FLASHCARDS (NEW) -->
+        <!-- Flashcards Screen -->
         <div id="flashcards-screen" class="hidden flex flex-col min-h-[70vh] animate-fade-in-up">
             <div class="bg-white rounded-3xl shadow-soft border border-slate-100 p-6 flex-grow relative flex flex-col items-center justify-center">
                 <div class="absolute top-4 left-6 text-sm font-bold text-slate-400" id="flashcard-counter">1/5</div>
                 <button onclick="location.reload()" class="absolute top-4 right-6 text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
-                
-                <div class="perspective w-full max-w-md h-64 cursor-pointer group" onclick="this.querySelector('.flashcard').classList.toggle('flipped')">
-                    <div class="flashcard w-full h-full relative transition-transform duration-700 transform-style-3d">
-                        <div class="flashcard-front absolute w-full h-full bg-white border-2 border-slate-100 rounded-2xl shadow-sm flex items-center justify-center p-8 text-center backface-hidden">
-                            <div>
-                                <span class="text-xs uppercase font-bold text-indigo-500 tracking-widest mb-2 block">Pergunta</span>
-                                <h3 class="text-xl font-bold text-slate-800" id="fc-front">...</h3>
-                                <p class="text-xs text-slate-400 mt-4 font-medium"><i class="fas fa-sync mr-1"></i> Toque para virar</p>
-                            </div>
-                        </div>
-                        <div class="flashcard-back absolute w-full h-full bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl shadow-lg flex items-center justify-center p-8 text-center backface-hidden text-white rotate-y-180">
-                            <div>
-                                <span class="text-xs uppercase font-bold text-indigo-200 tracking-widest mb-2 block">Resposta</span>
-                                <p class="text-lg font-medium leading-relaxed" id="fc-back">...</p>
-                            </div>
-                        </div>
+                <div class="perspective w-full max-w-md h-64 cursor-pointer group" onclick="this.querySelector('.flashcard-inner').classList.toggle('flipped')">
+                    <div class="flashcard-inner w-full h-full relative transition-transform duration-700 transform-style-3d">
+                        <div class="flashcard-front absolute w-full h-full bg-white border-2 border-slate-100 rounded-2xl shadow-sm flex items-center justify-center p-8 text-center backface-hidden"><div><span class="text-xs uppercase font-bold text-indigo-500 tracking-widest mb-2 block">Pergunta</span><h3 class="text-xl font-bold text-slate-800" id="fc-front">...</h3><p class="text-xs text-slate-400 mt-4 font-medium"><i class="fas fa-sync mr-1"></i> Toque para virar</p></div></div>
+                        <div class="flashcard-back absolute w-full h-full bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl shadow-lg flex items-center justify-center p-8 text-center backface-hidden text-white rotate-y-180"><div><span class="text-xs uppercase font-bold text-indigo-200 tracking-widest mb-2 block">Resposta</span><p class="text-lg font-medium leading-relaxed" id="fc-back">...</p></div></div>
                     </div>
                 </div>
-
-                <div class="flex gap-4 mt-10">
-                    <button onclick="app.nextFlashcard()" class="bg-red-100 text-red-600 px-6 py-3 rounded-xl font-bold hover:bg-red-200 transition">Difícil</button>
-                    <button onclick="app.nextFlashcard()" class="bg-green-100 text-green-600 px-6 py-3 rounded-xl font-bold hover:bg-green-200 transition">Fácil</button>
-                </div>
-                
-                <div id="fc-lock" class="absolute inset-0 bg-white/90 backdrop-blur-sm z-10 hidden flex-col items-center justify-center text-center p-8">
-                    <i class="fas fa-lock text-4xl text-yellow-500 mb-4"></i>
-                    <h3 class="font-bold text-xl text-slate-800">Modo Estudo Bloqueado</h3>
-                    <p class="text-sm text-slate-500 mb-6">Acesso ilimitado a Flashcards apenas para membros Gold.</p>
-                    <button onclick="app.showUpgradeModal()" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700">Desbloquear</button>
-                </div>
+                <div class="flex gap-4 mt-10"><button onclick="app.nextFlashcard()" class="bg-red-100 text-red-600 px-6 py-3 rounded-xl font-bold hover:bg-red-200">Difícil</button><button onclick="app.nextFlashcard()" class="bg-green-100 text-green-600 px-6 py-3 rounded-xl font-bold hover:bg-green-200">Fácil</button></div>
+                <div id="fc-lock" class="absolute inset-0 bg-white/90 backdrop-blur-sm z-10 hidden flex-col items-center justify-center text-center p-8"><i class="fas fa-lock text-4xl text-yellow-500 mb-4"></i><h3 class="font-bold text-xl text-slate-800">Bloqueado</h3><p class="text-sm text-slate-500 mb-6">Flashcards ilimitados apenas Gold.</p><button onclick="app.showUpgradeModal()" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg">Desbloquear</button></div>
             </div>
         </div>
 
+        <!-- Results Screen -->
+        <div id="result-screen" class="hidden pb-12">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden relative mb-6">
+                <div class="bg-main-gradient p-8 text-white text-center"><h2 class="text-xs uppercase font-bold opacity-80">Nota Final</h2><div class="text-6xl font-extrabold font-heading"><span id="final-score">0</span> <span class="text-2xl opacity-50">/ 80</span></div></div>
+                <div class="p-4 flex justify-center gap-3 bg-slate-50 border-t"><button onclick="app.openLeaderboard()" class="text-xs font-bold text-slate-600 bg-white border px-4 py-2 rounded">Ranking</button><button onclick="location.reload()" class="text-xs font-bold text-white bg-indigo-600 px-4 py-2 rounded">Novo</button></div>
+            </div>
+            <div class="flex border-b border-slate-200 mb-6 overflow-x-auto gap-6 px-2">
+                <button onclick="app.switchTab('review')" id="tab-btn-review" class="pb-3 text-indigo-600 border-b-2 border-indigo-600 font-bold">Gabarito</button>
+                <button onclick="app.switchTab('discursive')" id="tab-btn-discursive" class="pb-3 text-slate-400 hover:text-yellow-600 border-b-2 border-transparent hidden font-medium">Discursiva</button>
+            </div>
+            <div id="tab-review" class="tab-content">
+                <div class="flex gap-2 mb-6 justify-end"><button onclick="app.filterReview('all')" class="px-4 py-1.5 text-xs rounded-full bg-white border">Todas</button><button onclick="app.filterReview('wrong')" class="px-4 py-1.5 text-xs rounded-full bg-red-50 text-red-600 border border-red-100">Erros</button></div>
+                <div id="review-container" class="space-y-4"></div>
+                <div id="review-premium-block" class="hidden mt-8 p-8 bg-slate-800 rounded-2xl text-center text-white shadow-xl cursor-pointer" onclick="app.showUpgradeModal()"><i class="fas fa-lock text-3xl mb-2 text-slate-400"></i><h3 class="font-bold">Comentários Bloqueados</h3><button class="mt-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-2 rounded">Desbloquear</button></div>
+            </div>
+            <div id="tab-discursive" class="tab-content hidden"><div class="bg-white rounded-3xl shadow-soft border border-yellow-100 p-8"><h3 class="font-bold text-xl text-slate-800 mb-4">Estudo de Caso</h3><p id="discursive-text" class="text-slate-700 italic bg-slate-50 p-4 rounded"></p><div class="mt-4 p-4 bg-emerald-50 text-sm"><p id="discursive-answer"></p></div></div></div>
+        </div>
     </main>
 
-    <!-- MODALS -->
+    <!-- Modals: Auth, Upgrade, Checkout, Leaderboard, Admin, RealExam, JumpMenu -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/90 z-[70] flex items-center justify-center p-4"><div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-8 text-center"><h3 class="font-bold text-xl mb-6">Login</h3><button onclick="app.handleGoogleLogin()" class="w-full bg-white border font-bold py-3 rounded-lg flex justify-center gap-2 mb-4 text-sm text-slate-700"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4"> Google</button><div class="text-[10px] text-slate-400 my-3">OU EMAIL</div><input id="auth-email" type="email" placeholder="Email" class="w-full border p-2 rounded mb-2 text-sm"><input id="auth-pass" type="password" placeholder="Senha" class="w-full border p-2 rounded mb-4 text-sm"><button onclick="app.handleAuth()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded">Entrar</button><button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="mt-4 text-xs text-slate-400">Cancelar</button></div></div>
+    
+    <div id="upgrade-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"><div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6 pt-10 pb-10"><div class="bg-white rounded-2xl shadow-2xl border-4 border-slate-100 p-6 text-center"><h3 class="text-2xl font-bold text-slate-600">SILVER</h3><div class="text-4xl font-bold text-slate-800 my-4">R$ 9,90</div><ul class="space-y-3 text-sm text-slate-600 mb-8"><li>3 Simulados/dia</li><li>Ranking & Gabarito</li></ul><button onclick="app.initPayment('silver', 'pix')" class="w-full bg-emerald-100 text-emerald-700 font-bold py-3 rounded-xl mb-2">PIX</button><button onclick="app.initPayment('silver', 'card')" class="w-full border font-bold py-3 rounded-xl">Cartão</button></div><div class="bg-white rounded-2xl shadow-2xl border-4 border-yellow-400 p-6 text-center relative"><div class="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-2 py-1 rounded-bl">BEST</div><h3 class="text-2xl font-bold text-slate-800">GOLD</h3><div class="text-4xl font-bold text-slate-900 my-4">R$ 19,90</div><ul class="space-y-3 text-sm text-slate-600 mb-8"><li><strong>Ilimitado</strong></li><li>Correção Real</li><li>Flashcards</li></ul><button onclick="app.initPayment('gold', 'pix')" class="w-full bg-yellow-400 text-yellow-900 font-bold py-3 rounded-xl mb-2">PIX</button><button onclick="app.initPayment('gold', 'card')" class="w-full border font-bold py-2 rounded-xl text-xs">Cartão (R$ 29,90)</button></div></div><button onclick="document.getElementById('upgrade-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white text-2xl"><i class="fas fa-times"></i></button></div>
 
-    <!-- Upgrade Modal (Pricing Table) -->
-    <div id="upgrade-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6 pt-10 pb-10">
-            
-            <!-- SILVER PLAN -->
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-slate-100 transform hover:scale-105 transition duration-300">
-                <div class="bg-slate-100 p-6 text-center">
-                    <h3 class="text-2xl font-bold text-slate-600 font-heading"><i class="fas fa-medal text-slate-400"></i> SILVER</h3>
-                    <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Intermediário</p>
-                </div>
-                <div class="p-6">
-                    <div class="text-center mb-6">
-                        <span class="text-4xl font-bold text-slate-800">R$ 9,90</span>
-                    </div>
-                    <ul class="space-y-3 text-sm text-slate-600 mb-8">
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-indigo-500"></i> <span>3 Simulados/dia</span></li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-indigo-500"></i> <span>Acesso ao Ranking</span></li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-indigo-500"></i> <span>Gabarito Comentado</span></li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-indigo-500"></i> <span>Evolução (Gráficos)</span></li>
-                        <li class="flex items-center gap-3 opacity-50"><i class="fas fa-times text-red-400"></i> <span>Prova Real / Pegadinhas</span></li>
-                    </ul>
-                    <div class="space-y-3">
-                        <button onclick="app.initPayment('silver', 'pix')" class="w-full bg-emerald-100 text-emerald-700 font-bold py-3 rounded-xl hover:bg-emerald-200 flex items-center justify-center gap-2 mb-2">
-                            <i class="fas fa-qrcode"></i> PIX (R$ 9,40 c/ desc)
-                        </button>
-                        <button onclick="app.initPayment('silver', 'card')" class="w-full border border-slate-200 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-2">
-                            <i class="far fa-credit-card"></i> Cartão (R$ 9,90)
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <div id="checkout-modal" class="hidden fixed inset-0 bg-slate-900/80 z-[60] flex items-center justify-center p-4"><div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"><div class="flex justify-between items-center mb-4"><h3 class="font-bold">Checkout</h3><button onclick="app.closeCheckout()"><i class="fas fa-times"></i></button></div><div id="pay-content" class="text-center py-4"></div></div></div>
+    <div id="payment-success" class="hidden fixed inset-0 bg-emerald-500 z-[65] flex-col items-center justify-center text-center p-8 text-white"><h3 class="font-bold text-3xl mb-4">Sucesso!</h3><button onclick="app.finishUpgrade()" class="bg-white text-emerald-600 font-bold py-3 px-10 rounded-full shadow-xl">Continuar</button></div>
 
-            <!-- GOLD PLAN -->
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-yellow-400 transform hover:scale-105 transition duration-300 relative">
-                <div class="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-3 py-1 rounded-bl-lg z-10">MAIS VENDIDO</div>
-                <div class="bg-gradient-to-r from-yellow-400 to-orange-400 p-6 text-center text-white">
-                    <h3 class="text-2xl font-bold font-heading"><i class="fas fa-crown"></i> GOLD</h3>
-                    <p class="text-xs uppercase tracking-widest mt-1 text-yellow-100">Acesso Total</p>
-                </div>
-                <div class="p-6">
-                    <div class="text-center mb-6">
-                        <p class="text-xs text-slate-400 line-through">De R$ 49,90</p>
-                        <span class="text-4xl font-bold text-slate-800">R$ 19,90</span>
-                        <span class="text-xs text-green-600 font-bold bg-green-100 px-2 py-1 rounded ml-2">NO PIX</span>
-                    </div>
-                    <ul class="space-y-3 text-sm text-slate-600 mb-8 font-medium">
-                        <li><i class="fas fa-check-circle text-yellow-500"></i> <span><strong>ILIMITADO</strong> (Sem restrições)</span></li>
-                        <li><i class="fas fa-check-circle text-yellow-500"></i> <span>Tudo do Silver +</span></li>
-                        <li><i class="fas fa-check-circle text-yellow-500"></i> <span>Correção Prova Real (21/12)</span></li>
-                        <li><i class="fas fa-check-circle text-yellow-500"></i> <span>Área de Pegadinhas</span></li>
-                    </ul>
-                    <div class="space-y-3">
-                        <button onclick="app.initPayment('gold', 'pix')" class="w-full bg-yellow-400 text-yellow-900 font-bold py-3 rounded-xl hover:bg-yellow-300 flex items-center justify-center gap-2 mb-2 shadow-lg">
-                            <i class="fas fa-qrcode"></i> PIX (R$ 19,90)
-                        </button>
-                        <button onclick="app.initPayment('gold', 'card')" class="w-full border border-slate-200 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-2">
-                            <i class="far fa-credit-card"></i> Cartão (R$ 29,90)
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button onclick="document.getElementById('upgrade-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white text-2xl hover:opacity-80"><i class="fas fa-times"></i></button>
-    </div>
+    <div id="leaderboard-modal" class="hidden fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4"><div class="bg-white rounded-3xl w-full max-w-md h-[80vh] flex flex-col relative"><div class="p-4 border-b flex justify-between"><h3 class="font-bold">Ranking</h3><button onclick="app.closeLeaderboard()"><i class="fas fa-times"></i></button></div><div id="leaderboard-content" class="p-0 overflow-y-auto flex-grow"></div><div id="leaderboard-locked-overlay" class="hidden absolute inset-0 top-14 bg-white/80 flex-col items-center justify-center"><button onclick="app.showUpgradeModal()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl shadow-lg">Liberar Premium</button></div></div></div>
 
-    <!-- Checkout Modal -->
-    <div id="checkout-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
-            <button onclick="document.getElementById('checkout-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400"><i class="fas fa-times"></i></button>
-            <h3 class="font-bold text-lg mb-4 text-center">Pagamento Seguro</h3>
-            <div id="pay-content" class="text-center py-4"></div>
-        </div>
-    </div>
-
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/90 z-[70] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-8 text-center">
-            <h3 class="font-bold text-xl mb-6">Identifique-se</h3>
-            <button onclick="app.handleGoogleLogin()" class="w-full bg-white border font-bold py-3 rounded-lg flex justify-center gap-2 mb-4 shadow-sm text-sm text-slate-700 hover:bg-slate-50">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4"> Entrar com Google
-            </button>
-            <div class="text-[10px] text-slate-400 my-3">OU USE EMAIL</div>
-            <input id="auth-email" type="email" placeholder="Email" class="w-full border p-2 rounded mb-2 text-sm"><input id="auth-pass" type="password" placeholder="Senha" class="w-full border p-2 rounded mb-4 text-sm">
-            <button onclick="app.handleAuth()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded hover:bg-indigo-700">Entrar</button>
-            <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="mt-4 text-xs text-slate-400">Cancelar</button>
-        </div>
-    </div>
-
-    <!-- Comparison Modal -->
-    <div id="comparison-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col animate-fade-in-up overflow-hidden border border-slate-200">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-xl text-slate-800 font-heading"><i class="fas fa-table text-indigo-500 mr-2"></i>Comparativo de Planos</h3>
-                <button onclick="app.closeComparisonModal()" class="w-8 h-8 bg-white rounded-full text-slate-400 hover:text-red-500 shadow-sm flex items-center justify-center transition"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-0 overflow-y-auto flex-grow">
-                <table class="w-full text-sm text-left text-slate-600">
-                    <thead class="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0 z-10">
-                        <tr><th class="px-6 py-4 font-bold">Recurso</th><th class="px-6 py-4 text-center">Free</th><th class="px-6 py-4 text-center bg-yellow-50 text-yellow-800 border-b-2 border-yellow-400">Premium 👑</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Simulados Diários</td><td class="px-6 py-4 text-center">Limitado a 2</td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30">Ilimitado</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Ranking Global</td><td class="px-6 py-4 text-center">Apenas Posição</td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30">Top 100 Completo</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Gabarito</td><td class="px-6 py-4 text-center">Simples</td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30">Comentado Detalhado</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Questão Discursiva</td><td class="px-6 py-4 text-center text-red-400"><i class="fas fa-times"></i></td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30"><i class="fas fa-check"></i></td></tr>
-                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium text-slate-900">Correção Prova Real (21/12)</td><td class="px-6 py-4 text-center text-red-400"><i class="fas fa-times"></i></td><td class="px-6 py-4 text-center font-bold text-emerald-600 bg-yellow-50/30"><i class="fas fa-check"></i></td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="p-6 bg-slate-50 border-t border-slate-200 text-center">
-                <button onclick="app.showUpgradeModal()" class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-3 px-12 rounded-xl shadow-lg transition-all transform hover:-translate-y-1">Quero Ser Premium Agora</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Jump Menu -->
-    <div id="jump-menu" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col animate-fade-in-up overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-bold text-lg text-slate-800">Navegação Rápida</h3>
-                <button onclick="app.closeJumpMenu()" class="w-8 h-8 bg-slate-100 rounded-full text-slate-500 flex items-center justify-center"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="jump-grid" class="p-6 overflow-y-auto grid grid-cols-5 sm:grid-cols-10 gap-3 bg-slate-50/50"></div>
-        </div>
-    </div>
-
-    <!-- Leaderboard Modal -->
-    <div id="leaderboard-modal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col animate-fade-in border border-slate-200 overflow-hidden relative">
-            <div class="p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                <div><h3 class="font-bold text-xl text-slate-800 font-heading"><i class="fas fa-trophy text-yellow-500 mr-2"></i>Ranking Global</h3><p class="text-xs text-slate-500">Top 100 Melhores Notas</p></div>
-                <button onclick="app.closeLeaderboard()" class="w-8 h-8 bg-white rounded-full text-slate-400 hover:text-red-500 shadow-sm flex items-center justify-center transition"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="leaderboard-content" class="p-0 overflow-y-auto flex-grow bg-white relative min-h-[300px]">
-                <div class="p-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-3xl mb-2 text-indigo-500"></i><br>Carregando dados...</div>
-            </div>
-            <div id="leaderboard-locked-overlay" class="absolute inset-0 top-[80px] bg-white/60 backdrop-blur-md z-10 hidden flex-col items-center justify-center text-center p-8">
-                <div class="bg-white p-8 rounded-3xl shadow-2xl border border-yellow-100 max-w-xs relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-yellow-400"></div>
-                    <i class="fas fa-lock text-5xl text-yellow-400 mb-4 drop-shadow-sm"></i>
-                    <h4 class="font-bold text-slate-800 text-xl mb-2 font-heading">Ranking Bloqueado</h4>
-                    <p class="text-sm text-slate-500 mb-6 leading-relaxed">Apenas membros Premium podem ver a lista completa e comparar estratégias.</p>
-                    <button onclick="app.showUpgradeModal()" class="w-full bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-indigo-700 transition">Liberar Agora</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[90] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 border border-slate-200">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-600"><i class="fas fa-shield-alt text-3xl"></i></div>
-                <h3 class="text-xl font-bold text-slate-800 font-heading">Acesso Restrito</h3>
-            </div>
-            <div class="space-y-3">
-                <input type="email" id="admin-email" placeholder="E-mail Administrativo" class="w-full border border-slate-300 bg-slate-50 p-3 rounded-lg text-sm focus:ring-2 focus:ring-slate-500 outline-none">
-                <input type="password" id="admin-pass" placeholder="Senha" class="w-full border border-slate-300 bg-slate-50 p-3 rounded-lg text-sm focus:ring-2 focus:ring-slate-500 outline-none">
-                <button onclick="app.handleAdminLogin()" class="w-full bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Entrar</button>
-                <button onclick="document.getElementById('admin-login-modal').classList.add('hidden')" class="w-full text-slate-400 text-xs hover:text-slate-600 mt-3 block text-center">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Panel -->
-    <div id="admin-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-            <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold flex items-center gap-2"><i class="fas fa-key text-yellow-400"></i> Gabarito Oficial</h3>
-                <div class="flex gap-3"><button onclick="app.logout()" class="text-xs bg-red-500/20 text-red-300 hover:text-white px-3 py-1.5 rounded border border-red-500/30 transition">Sair</button><button onclick="document.getElementById('admin-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-lg"></i></button></div>
-            </div>
-            <div class="p-8 overflow-y-auto bg-slate-50 flex-grow"><div id="admin-grid" class="admin-input-grid"></div></div>
-            <div class="p-6 bg-white border-t border-slate-200 flex justify-end"><button onclick="app.saveOfficialKey()" class="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 shadow-lg">Publicar</button></div>
-        </div>
-    </div>
-
-    <!-- Real Exam Correction -->
-    <div id="real-exam-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
-            <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-6 flex justify-between items-center">
-                <div><h3 class="font-bold text-xl font-heading">Correção Prova Real</h3><p class="text-sm text-emerald-100">Insira suas respostas do dia 21/12</p></div>
-                <button onclick="document.getElementById('real-exam-modal').classList.add('hidden')" class="w-8 h-8 bg-white/20 rounded-full hover:bg-white/30 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="real-exam-content" class="flex-grow overflow-y-auto p-6 bg-slate-50">
-                <div id="real-exam-loading" class="text-center py-20"><div class="spinner-border w-16 h-16 border-4 rounded-full text-teal-500 mb-6 mx-auto"></div><h4 class="font-bold text-slate-700">Verificando Gabarito...</h4></div>
-                <div id="real-exam-input" class="hidden"><div id="user-exam-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-3"></div></div>
-                <div id="real-exam-result" class="hidden text-center">
-                    <span class="text-xs uppercase font-bold text-slate-400 tracking-widest">Sua Nota Final</span>
-                    <div class="text-6xl font-extrabold text-slate-800 mt-2 font-heading" id="real-score-display">0.0</div>
-                    <div class="grid grid-cols-2 gap-4 max-w-lg mx-auto mt-6" id="real-breakdown"></div>
-                </div>
-            </div>
-            <div class="p-6 bg-white border-t border-slate-200 flex justify-end" id="real-exam-footer"><button onclick="app.calculateRealScore()" class="bg-teal-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-teal-700 shadow-lg transition transform hover:-translate-y-1">Calcular</button></div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
+    <div id="real-exam-modal" class="hidden fixed inset-0 bg-slate-900/80 z-[70] flex items-center justify-center p-4"><div class="bg-white rounded-2xl w-full max-w-4xl h-[90vh] flex flex-col"><div class="p-6 bg-teal-600 text-white flex justify-between"><h3 class="font-bold">Correção Real</h3><button onclick="document.getElementById('real-exam-modal').classList.add('hidden')"><i class="fas fa-times"></i></button></div><div id="real-exam-content" class="flex-grow overflow-y-auto p-6"><div id="real-exam-loading" class="text-center py-20">Carregando...</div><div id="real-exam-input" class="hidden"><div id="user-exam-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2"></div></div><div id="real-exam-result" class="hidden text-center"><div class="text-6xl font-bold" id="real-score-display"></div></div></div><div class="p-6 border-t flex justify-end" id="real-exam-footer"><button onclick="app.calculateRealScore()" class="bg-teal-600 text-white px-6 py-2 rounded">Calcular</button></div></div></div>
+    
+    <div id="admin-login-modal" class="hidden fixed inset-0 bg-slate-900/90 z-[90] flex items-center justify-center p-4"><div class="bg-white rounded-2xl p-8 max-w-sm w-full"><h3 class="font-bold text-xl mb-4">Admin</h3><input id="admin-email" class="w-full border p-2 mb-2"><input id="admin-pass" type="password" class="w-full border p-2 mb-4"><button onclick="app.handleAdminLogin()" class="w-full bg-slate-800 text-white py-2 rounded">Entrar</button><button onclick="document.getElementById('admin-login-modal').classList.add('hidden')" class="w-full mt-2 text-xs">Cancelar</button></div></div>
+    <div id="admin-modal" class="hidden fixed inset-0 bg-slate-900/90 z-[80] flex items-center justify-center p-4"><div class="bg-white rounded-2xl w-full max-w-5xl h-[90vh] flex flex-col"><div class="p-4 bg-slate-800 text-white flex justify-between"><h3 class="font-bold">Admin Panel</h3><button onclick="document.getElementById('admin-modal').classList.add('hidden')"><i class="fas fa-times"></i></button></div><div class="p-8 overflow-y-auto flex-grow"><div id="admin-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2"></div></div><div class="p-6 border-t flex justify-end"><button onclick="app.saveOfficialKey()" class="bg-green-600 text-white px-6 py-2 rounded">Publicar</button></div></div></div>
+    <div id="jump-menu" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4"><div class="bg-white rounded-xl w-full max-w-lg h-[70vh] flex flex-col"><div class="p-4 border-b flex justify-between"><h3>Mapa</h3><button onclick="app.closeJumpMenu()"><i class="fas fa-times"></i></button></div><div id="jump-grid" class="p-4 grid grid-cols-5 gap-2 overflow-y-auto"></div></div></div>
+    
+    <!-- Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, addDoc, getDocs, updateDoc, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        let firebaseConfig;
-        try { firebaseConfig = JSON.parse(__firebase_config); } catch (e) { firebaseConfig = { apiKey: "mock", authDomain: "mock", projectId: "mock" }; }
+        // CONFIGURATION (Replace with your real config)
+        const firebaseConfig = {
+          apiKey: "AIzaSyBNZ53HLq_GUviwRdO1qA27Q6eiE0dFInc",
+          authDomain: "simulador-2b507.firebaseapp.com",
+          projectId: "simulador-2b507",
+          storageBucket: "simulador-2b507.firebasestorage.app",
+          messagingSenderId: "1097583089104",
+          appId: "1:1097583089104:web:c90293d58e1678dc3895d5",
+          measurementId: "G-1N5MY4FC9S"
+        };
+
         const appInstance = initializeApp(firebaseConfig);
         const auth = getAuth(appInstance);
         const db = getFirestore(appInstance);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const ADMIN_EMAIL = "admin@pmpa.com"; 
+        const appId = "default-app-id";
+        const ADMIN_EMAIL = "tlopes.dev@gmail.com";
 
         let currentUser = null;
         let userProfile = { subscription: 'free', dailyCount: 0, lastDate: "", history: [] };
         let checkPaymentInterval = null;
         let officialKeyData = null;
-
-        // --- COUNTDOWN LOGIC ---
-        setInterval(() => {
-            const target = new Date("2025-12-21T00:00:00").getTime();
-            const now = new Date().getTime();
-            const diff = target - now;
-            if(diff > 0) {
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                document.getElementById('countdown-timer').innerText = `${d} DIAS`;
-            } else {
-                document.getElementById('countdown-timer').innerText = "É HOJE!";
-            }
-        }, 1000);
-
-        // --- AUTH ---
+        
+        // AUTH
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if(user) {
-                if(user.displayName) {
-                    const greeting = document.getElementById('user-greeting');
-                    if(greeting) greeting.innerText = `Olá, ${user.displayName.split(' ')[0]}!`;
-                    const inp = document.getElementById('username'); if(inp) { inp.value=user.displayName; inp.disabled=true; }
-                }
-                if(user.photoURL) {
-                    const avt = document.getElementById('user-avatar-container');
-                    if(avt) avt.innerHTML = `<img src="${user.photoURL}" class="w-10 h-10 rounded-full border border-slate-200 object-cover">`;
-                }
+                if(user.displayName) document.getElementById('username').value = user.displayName;
+                if(user.photoURL) document.getElementById('user-avatar-container').innerHTML = `<img src="${user.photoURL}" class="w-10 h-10 rounded-full border object-cover">`;
+                document.getElementById('auth-status').innerHTML = '<span class="text-green-500 font-bold">Conectado</span>';
                 document.getElementById('btn-logout').classList.remove('hidden');
                 await loadProfile();
-                const urlParams = new URLSearchParams(window.location.search);
-                if(urlParams.get('admin') === 'true') document.getElementById('admin-panel-trigger').style.display = 'block';
+                if(new URLSearchParams(window.location.search).get('admin')==='true') document.getElementById('admin-panel-trigger').style.display='block';
             } else {
+                document.getElementById('auth-status').innerText = "Visitante";
                 document.getElementById('btn-logout').classList.add('hidden');
                 userProfile = { subscription: 'free', dailyCount: 0 };
                 app.updateUI();
             }
         });
+
+        const toast = (msg,type='success')=>{
+            const d=document.createElement('div'); d.className=`toast ${type} show`; d.innerHTML=`<span>${msg}</span>`;
+            document.getElementById('toast-container').appendChild(d); setTimeout(()=>d.remove(),3000);
+        };
 
         async function loadProfile() {
             if(!currentUser) return;
@@ -549,218 +227,250 @@
                 const today = new Date().toISOString().split('T')[0];
                 if(snap.exists()) {
                     userProfile = snap.data();
-                    if(userProfile.lastDate !== today) { await updateDoc(ref, { dailyCount: 0, lastDate: today }); userProfile.dailyCount = 0; }
+                    if(userProfile.lastDate !== today) { await updateDoc(ref, {dailyCount:0, lastDate:today}); userProfile.dailyCount=0; }
                 } else {
-                    userProfile = { subscription: 'free', dailyCount: 0, lastDate: today, history: [] };
+                    userProfile = { subscription:'free', dailyCount:0, lastDate:today, history:[] };
                     await setDoc(ref, userProfile);
                 }
                 app.updateUI(); app.updateProbability();
-            } catch(e) {}
+            } catch(e){}
         }
 
-        // --- FLASHCARDS DATA ---
-        const flashcards = [
-            {q: "Prazo Licença Paternidade POA", a: "8 dias consecutivos (LC 133/85)"},
-            {q: "Data Magna de POA", a: "26 de Março"},
-            {q: "Sinal de Guaxinim indica...", a: "Fratura de Base de Crânio"},
-            {q: "Antídoto Opioides", a: "Naloxona"},
-            {q: "Via Vacina BCG", a: "Intradérmica (ID)"},
-            {q: "Compressões RCP Adulto", a: "30:2 (100-120/min)"},
-            {q: "Cor Lixo Infectante", a: "Branco Leitoso"}
-        ];
+        // QUIZ DATA
+        const rnd = (min, max) => Math.floor(Math.random()*(max-min+1))+min;
+        const state = { questions:[], answers:[], score:0, qIndex:0 };
+        const generateQuestions = () => {
+            const p=[]; for(let i=0; i<60; i++) {
+                let t=`Questão ${i+1}`, r="Explicação...", a=0, c="Específicos", w=1.0;
+                if(i%5===0) { c="Raciocínio Lógico"; let x=rnd(2,9),y=rnd(2,5); t=`Próximo: ${x}, ${x+y}...`; a=2; w=0.5; }
+                p.push({id:i+1, c, w, t, o:['A','B','C','D'], a, r});
+            }
+            return p;
+        };
+        const discursivePool = [{t:"Descreva Heimlich.", r:"Urgência"}];
+        const flashcards = [{q:"Prazo Licença", a:"8 dias"}, {q:"Data Magna", a:"26/03"}];
         let fcIndex = 0;
 
+        // APP METHODS
         const app = {
             updateUI: () => {
-                const sub = userProfile.subscription || 'free';
+                const s = userProfile.subscription||'free';
                 const badge = document.getElementById('user-badge');
-                const idLabel = document.getElementById('id-card-label');
-                const idCard = document.getElementById('id-card');
+                const label = document.getElementById('id-card-label');
+                const card = document.getElementById('id-card');
                 const credits = document.getElementById('credits-count');
-                const creditsTotal = document.getElementById('credits-total');
-                const limitMsg = document.getElementById('limit-warning');
-                const btnStart = document.getElementById('btn-start');
                 
-                if(sub === 'gold') {
-                    badge.innerText = "GOLD"; badge.className = "ml-2 text-[10px] font-bold bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded shadow";
-                    document.getElementById('premium-cta-banner').classList.add('hidden');
-                    idCard.classList.add('premium-shine', 'border-yellow-400'); idCard.classList.remove('bg-white/80');
-                    idLabel.innerText = "MEMBRO GOLD";
-                } else if(sub === 'silver') {
-                    badge.innerText = "SILVER"; badge.className = "ml-2 text-[10px] font-bold bg-slate-300 text-slate-800 px-2 py-0.5 rounded shadow";
-                    idLabel.innerText = "MEMBRO SILVER";
-                } else {
-                    badge.innerText = "FREE"; badge.className = "ml-2 text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded border";
-                    idCard.classList.add('bg-white/80'); idCard.classList.remove('premium-shine', 'border-yellow-400');
-                    idLabel.innerText = "PLANO GRATUITO";
-                }
+                let max=1, txt="FREE", cls="bg-slate-100", cCls="border-slate-200", shine=false;
+                if(s==='gold'){ max=999; txt="GOLD"; cls="bg-yellow-400"; cCls="border-yellow-400"; shine=true; }
+                else if(s==='silver'){ max=3; txt="SILVER"; cls="bg-slate-300"; cCls="border-slate-300"; shine=true; }
                 
-                const limit = sub === 'gold' ? 9999 : (sub === 'silver' ? 3 : 1);
-                const rem = Math.max(0, limit - (userProfile.dailyCount || 0));
-                if(credits) credits.innerText = limit > 100 ? "∞" : rem;
-                if(creditsTotal) creditsTotal.innerText = limit > 100 ? "" : `/${limit}`;
+                badge.innerText=txt; badge.className=`ml-1 text-[10px] px-2 rounded-full border ${cls}`;
+                label.innerText=`PLANO ${txt}`;
+                card.className=`p-4 rounded-2xl shadow-sm max-w-sm mx-auto md:mx-0 border ${cCls} ${shine?'premium-shine':'bg-white'}`;
                 
-                if(rem===0 && limit < 100) {
-                    limitMsg.classList.remove('hidden');
-                    btnStart.disabled = true; btnStart.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    limitMsg.classList.add('hidden');
-                    btnStart.disabled = false; btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
+                const rem = Math.max(0, max - (userProfile.dailyCount||0));
+                credits.innerText = max>100 ? "∞" : rem;
                 
-                const lockReal = document.getElementById('real-exam-lock');
-                if(lockReal) lockReal.className = sub==='gold' ? "fas fa-unlock text-teal-400" : "fas fa-lock text-slate-300";
+                if(rem===0 && max<100) document.getElementById('limit-warning').classList.remove('hidden');
+                else document.getElementById('limit-warning').classList.add('hidden');
+                
+                if(s==='gold') document.getElementById('real-exam-lock').className="fas fa-unlock text-teal-400";
+                else document.getElementById('real-exam-lock').className="fas fa-lock text-slate-300";
             },
 
             updateProbability: () => {
-                const hist = userProfile.history || [];
-                if(hist.length === 0) return;
-                const avg = hist.reduce((a,b)=>a+b,0)/hist.length;
-                // Algoritmo de Probabilidade Simples
-                let prob = Math.round(avg * 0.8 + (hist.length * 2)); 
-                if(prob > 99) prob = 99;
-                
-                // Animate Gauge
-                const dash = 100 - prob;
+                const h = userProfile.history || [];
+                if(h.length===0) return;
+                const avg = Math.round(h.reduce((a,b)=>a+b,0)/h.length);
+                const prob = Math.min(99, Math.round(avg*0.8 + h.length*2));
                 document.getElementById('gauge-path').style.strokeDasharray = `${prob}, 100`;
                 document.getElementById('gauge-text').innerText = `${prob}%`;
-                
-                // Render Bar Chart
                 const chart = document.getElementById('stats-chart');
                 if(chart) {
-                    chart.innerHTML = '';
-                    hist.slice(-10).forEach(s => {
-                        const h = Math.max(s, 5);
-                        const bar = document.createElement('div');
-                        bar.className = `flex-1 ${s>=60?'bg-emerald-400':'bg-red-400'} rounded-t-md chart-bar relative group`;
-                        bar.style.height = `${h}%`;
-                        chart.appendChild(bar);
+                    chart.innerHTML='';
+                    h.slice(-10).forEach(s => {
+                        const b=document.createElement('div'); b.className=`flex-1 rounded-t-md chart-bar ${s>=60?'bg-emerald-400':'bg-red-400'}`; b.style.height=`${Math.max(s,5)}%`; chart.appendChild(b);
                     });
+                    document.getElementById('stats-avg').innerText = `${avg}%`;
+                }
+                if(userProfile.subscription!=='free') {
+                    document.getElementById('stats-lock').classList.add('hidden');
+                    document.getElementById('stats-weak').classList.remove('filter','blur-sm');
+                    document.getElementById('stats-weak').innerText = "Calculando...";
                 }
             },
 
-            // FLASHCARDS LOGIC
+            // QUIZ
+            startQuiz: () => {
+                if(!currentUser) return app.openAuthModal();
+                const limit = userProfile.subscription==='gold'?999:(userProfile.subscription==='silver'?3:1);
+                if((userProfile.dailyCount||0)>=limit) return app.showUpgradeModal();
+                
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+                document.getElementById('loading-overlay').classList.remove('hidden'); document.getElementById('loading-overlay').classList.add('flex');
+                setTimeout(()=>{
+                    state.questions = generateQuestions();
+                    state.answers = new Array(60).fill(null);
+                    state.qIndex = 0;
+                    document.getElementById('loading-overlay').classList.add('hidden'); document.getElementById('loading-overlay').classList.remove('flex');
+                    app.renderQ();
+                },1000);
+            },
+            renderQ: () => {
+                const q = state.questions[state.qIndex];
+                document.getElementById('question-text').innerText = q.t;
+                const c = document.getElementById('options-container'); c.innerHTML='';
+                q.o.forEach((opt,i)=>{
+                    const b=document.createElement('button'); b.className=`option-card w-full text-left p-4 rounded-xl border mb-2 ${state.answers[state.qIndex]===i?'bg-indigo-50 border-indigo-500':'bg-white'}`;
+                    b.innerText=opt; b.onclick=()=>{state.answers[state.qIndex]=i; app.renderQ();}; c.appendChild(b);
+                });
+                document.getElementById('progress-bar').style.width = `${((state.qIndex+1)/60)*100}%`;
+                document.getElementById('prev-btn').classList.toggle('hidden', state.qIndex===0);
+                document.getElementById('next-btn').classList.toggle('hidden', state.qIndex===59);
+                document.getElementById('finish-btn').classList.toggle('hidden', state.qIndex!==59);
+            },
+            prevQuestion: ()=>{if(state.qIndex>0){state.qIndex--;app.renderQ();}},
+            nextQuestion: ()=>{if(state.qIndex<59){state.qIndex++;app.renderQ(); window.scrollTo(0,0);}},
+            finishQuiz: async () => {
+                if(!confirm("Entregar?")) return;
+                const limit = userProfile.subscription==='gold'?999:(userProfile.subscription==='silver'?3:1);
+                if((userProfile.dailyCount||0)<limit) {
+                    try{ await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), {dailyCount: increment(1)}); userProfile.dailyCount++; }catch(e){}
+                }
+                state.score = Math.floor(Math.random()*80); // Mock calc
+                if(!userProfile.history) userProfile.history=[]; userProfile.history.push(Math.round((state.score/80)*100));
+                await saveUserProfile();
+
+                document.getElementById('final-score').innerText = state.score.toFixed(1);
+                if(userProfile.subscription==='gold') {
+                    document.getElementById('tab-btn-discursive').classList.remove('hidden');
+                    document.getElementById('discursive-text').innerText = discursivePool[0].t;
+                } else document.getElementById('tab-btn-discursive').classList.add('hidden');
+
+                if(userProfile.subscription==='free') {
+                     document.getElementById('review-premium-block').classList.remove('hidden');
+                     document.getElementById('review-container').innerHTML='';
+                } else {
+                     document.getElementById('review-premium-block').classList.add('hidden');
+                     const rc=document.getElementById('review-container'); rc.innerHTML='';
+                     state.questions.forEach((q,i)=>{
+                         const cor=state.answers[i]===q.a;
+                         rc.innerHTML+=`<div class="p-4 border rounded ${cor?'bg-green-50 border-green-200':'bg-red-50 border-red-200'}"><p class="font-bold text-sm">${q.t}</p><p class="text-xs">${q.r}</p></div>`;
+                     });
+                }
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.remove('hidden');
+                try{ await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard'), {name:document.getElementById('username').value, score:state.score, uid:currentUser.uid, plan:userProfile.subscription, photoURL:currentUser.photoURL}); }catch(e){}
+                window.scrollTo(0,0);
+            },
+
+            // FLASHCARDS
             openFlashcards: () => {
-                if(userProfile.subscription !== 'gold' && fcIndex >= 3) return app.showUpgradeModal(); // Free sees only 3
+                if(userProfile.subscription!=='gold' && fcIndex>=3) return app.showUpgradeModal();
                 document.getElementById('start-screen').classList.add('hidden');
                 document.getElementById('flashcards-screen').classList.remove('hidden');
                 app.renderFlashcard();
             },
             renderFlashcard: () => {
-                if(fcIndex >= flashcards.length) { fcIndex = 0; alert("Fim do baralho!"); location.reload(); return; }
-                // Check limit again for Gold
-                if(userProfile.subscription !== 'gold' && fcIndex >= 5) {
-                    document.getElementById('fc-lock').classList.remove('hidden');
-                    document.getElementById('fc-lock').classList.add('flex');
-                    return;
-                }
-                
-                const card = flashcards[fcIndex];
-                document.getElementById('fc-front').innerText = card.q;
-                document.getElementById('fc-back').innerText = card.a;
-                document.querySelector('.flashcard').classList.remove('flipped');
+                if(fcIndex>=flashcards.length){ fcIndex=0; alert("Fim!"); location.reload(); return;}
+                if(userProfile.subscription!=='gold' && fcIndex>=5) { document.getElementById('fc-lock').classList.remove('hidden'); document.getElementById('fc-lock').classList.add('flex'); return; }
+                const c = flashcards[fcIndex];
+                document.getElementById('fc-front').innerText = c.q; document.getElementById('fc-back').innerText = c.a;
+                document.querySelector('.flashcard-inner').classList.remove('flipped');
                 document.getElementById('flashcard-counter').innerText = `${fcIndex+1}/${flashcards.length}`;
             },
-            nextFlashcard: () => {
-                fcIndex++;
-                app.renderFlashcard();
-            },
+            nextFlashcard: () => { fcIndex++; app.renderFlashcard(); },
 
-            // ... (Existing Quiz & Payment Logic from V3.1 maintained) ...
-            startQuiz: () => {
-                if(!currentUser) return app.openAuthModal();
-                const limit = userProfile.subscription === 'gold' ? 9999 : (userProfile.subscription === 'silver' ? 3 : 1);
-                if((userProfile.dailyCount || 0) >= limit) return app.showUpgradeModal();
-                
-                // ... (Quiz loading logic)
-                document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('quiz-screen').classList.remove('hidden');
-                // Simulate load
-                app.loadQuestion();
-            },
-            loadQuestion: () => {
-                document.getElementById('question-text').innerText = "Questão Exemplo...";
-                document.getElementById('options-container').innerHTML = `<button onclick="app.finishQuiz()" class="w-full bg-white p-4 rounded border text-left hover:bg-indigo-50">Responder (Demo)</button>`;
-            },
-            finishQuiz: async () => {
-                if(!confirm("Entregar?")) return;
-                const limit = userProfile.subscription === 'gold' ? 9999 : (userProfile.subscription === 'silver' ? 3 : 1);
-                if((userProfile.dailyCount || 0) < limit) {
-                     try { await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { dailyCount: increment(1) }); } catch(e){}
-                }
-                
-                // Mock Score & History Save
-                const score = Math.floor(Math.random() * 80);
-                if(!userProfile.history) userProfile.history = [];
-                userProfile.history.push(Math.round((score/80)*100));
-                await saveUserProfile();
-                
-                document.getElementById('final-score').innerText = score;
-                document.getElementById('quiz-screen').classList.add('hidden');
-                document.getElementById('result-screen').classList.remove('hidden');
-                app.updateUI();
-            },
-            
-            // Payment
+            // PAYMENT
             initPayment: async (plan, method) => {
                 if(!currentUser) return app.openAuthModal();
                 document.getElementById('upgrade-modal').classList.add('hidden');
                 document.getElementById('checkout-modal').classList.remove('hidden');
-                const container = document.getElementById('pay-content');
-                container.innerHTML = '<div class="spinner-border w-10 h-10 border-4 rounded-full text-indigo-600 mx-auto mb-4"></div><p>Gerando...</p>';
-                
+                const c = document.getElementById('pay-content');
+                c.innerHTML = '<div class="spinner-border w-8 h-8 border-4 rounded-full text-indigo-600 mx-auto mb-4"></div><p class="text-sm">Gerando...</p>';
                 try {
-                    const res = await fetch('/api/create-preference', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ userId: currentUser.uid, email: currentUser.email, plan, method })
-                    });
+                    const res = await fetch('/api/create-preference', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({userId:currentUser.uid, email:currentUser.email, plan, method}) });
                     const data = await res.json();
-                    
-                    if(method === 'pix') {
-                         container.innerHTML = `<img src="data:image/png;base64,${data.qr_code_base64}" class="w-40 h-40 mx-auto"><p class="text-xs mt-2 break-all bg-slate-100 p-2 rounded">${data.qr_code}</p><div class="text-green-500 text-xs font-bold mt-2 animate-pulse">Aguardando pagamento...</div>`;
-                         // Polling logic here
-                         setTimeout(() => { userProfile.subscription = plan; saveUserProfile(); alert("Aprovado!"); location.reload(); }, 5000);
+                    if(method==='pix'){
+                        c.innerHTML = `<p class="text-xs font-bold mb-2">R$ ${data.price_charged}</p><img src="data:image/png;base64,${data.qr_code_base64}" class="w-40 h-40 mx-auto mb-2"><textarea class="w-full text-[10px] bg-slate-100 p-2" readonly>${data.qr_code}</textarea><button onclick="navigator.clipboard.writeText('${data.qr_code}');alert('Copiado')" class="text-indigo-600 font-bold text-xs mt-2">Copiar</button><div class="mt-4 text-xs text-green-600 animate-pulse font-bold">Aguardando...</div>`;
+                        checkPaymentInterval = setInterval(async ()=>{
+                            // Polling simulation. Real app uses onSnapshot listener on profile
+                            if(Math.random()>0.9) app.finishUpgrade(plan);
+                        }, 3000);
                     } else {
-                        container.innerHTML = `<a href="${data.init_point}" target="_blank" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold block">Pagar no Mercado Pago</a>`;
+                        c.innerHTML = `<a href="${data.init_point}" target="_blank" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold block">Pagar</a>`;
                     }
-                } catch(e) { container.innerHTML = "Erro."; }
+                } catch(e){ c.innerHTML="Erro"; }
+            },
+            finishUpgrade: async (plan) => {
+                if(checkPaymentInterval) clearInterval(checkPaymentInterval);
+                if(plan) userProfile.subscription = plan; else userProfile.isPremium = true; // fallback
+                await saveUserProfile();
+                document.getElementById('checkout-modal').classList.add('hidden');
+                document.getElementById('payment-success').classList.remove('hidden'); document.getElementById('payment-success').classList.add('flex');
+                setTimeout(()=>{ document.getElementById('payment-success').classList.add('hidden'); app.updateUI(); }, 2000);
             },
 
-            // Modals
-            openAuthModal: () => document.getElementById('auth-modal').classList.remove('hidden'),
-            handleGoogleLogin: async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); document.getElementById('auth-modal').classList.add('hidden'); } catch(e){ alert("Erro Google"); } },
-            handleAuth: async () => { /* Email Logic */ },
-            showUpgradeModal: () => document.getElementById('upgrade-modal').classList.remove('hidden'),
-            closeCheckout: () => document.getElementById('checkout-modal').classList.add('hidden'),
+            // MODALS & UTILS
+            openAuthModal: (m='login') => { document.getElementById('auth-modal').classList.remove('hidden'); app.switchAuthMode(m); },
+            switchAuthMode: (m) => { authMode=m; },
+            handleGoogleLogin: async () => { try{ await signInWithPopup(auth, new GoogleAuthProvider()); document.getElementById('auth-modal').classList.add('hidden'); }catch(e){ alert("Erro Google"); } },
+            handleAuth: async () => { const e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value; try{ if(authMode==='login') await signInWithEmailAndPassword(auth,e,p); else await createUserWithEmailAndPassword(auth,e,p); document.getElementById('auth-modal').classList.add('hidden'); }catch(x){ toast(x.message,"error"); } },
             logout: async () => { await signOut(auth); location.reload(); },
             installPWA: async () => { if(window.deferredPrompt) window.deferredPrompt.prompt(); },
             
-            // Admin & Real Exam Placeholders
-            openAdminLoginModal: () => document.getElementById('admin-login-modal').classList.remove('hidden'),
-            handleAdminLogin: async () => {
-                const email = document.getElementById('admin-email').value;
-                if(email === ADMIN_EMAIL) { document.getElementById('admin-login-modal').classList.add('hidden'); app.openAdminPanel(); }
-                else alert("Negado");
+            openLeaderboard: async () => {
+                document.getElementById('leaderboard-modal').classList.remove('hidden');
+                const c = document.getElementById('leaderboard-content');
+                const lk = document.getElementById('leaderboard-locked-overlay');
+                c.innerHTML = '<div class="p-8 text-center"><div class="spinner-border w-8 h-8 border-4 rounded-full text-indigo-600 mx-auto"></div></div>';
+                try {
+                    const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard'));
+                    let l = []; snap.forEach(d=>l.push(d.data())); l.sort((a,b)=>b.score-a.score);
+                    if(userProfile.subscription === 'free') {
+                        lk.classList.remove('hidden'); lk.classList.add('flex');
+                        c.innerHTML = l.slice(0,10).map((s,i)=>`<div class="flex justify-between p-3 border-b filter blur-[2px] opacity-50"><span>${i+1}. ${s.name}</span><span>${s.score}</span></div>`).join('');
+                    } else {
+                        lk.classList.add('hidden'); lk.classList.remove('flex');
+                        c.innerHTML = l.slice(0,50).map((s,i)=>`<div class="flex justify-between p-3 border-b ${s.plan==='gold'?'bg-yellow-50':''}"><span>${i+1}. ${s.name} ${s.plan==='gold'?'👑':''}</span><span class="font-bold text-indigo-600">${s.score}</span></div>`).join('');
+                    }
+                } catch(e){ c.innerHTML="Erro"; }
             },
-            openAdminPanel: () => document.getElementById('admin-modal').classList.remove('hidden'),
-            openRealExamCorrection: () => {
-                if(userProfile.subscription !== 'gold') return app.showUpgradeModal();
-                document.getElementById('real-exam-modal').classList.remove('hidden');
-            },
-            saveOfficialKey: () => alert("Salvo"),
-            calculateRealScore: () => alert("Cálculo"),
-            
             closeLeaderboard: () => document.getElementById('leaderboard-modal').classList.add('hidden'),
-            openLeaderboard: () => document.getElementById('leaderboard-modal').classList.remove('hidden'),
+            
+            openRealExamCorrection: () => {
+                if(userProfile.subscription!=='gold') return app.showUpgradeModal();
+                document.getElementById('real-exam-modal').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('real-exam-loading').classList.add('hidden');
+                    document.getElementById('real-exam-input').classList.remove('hidden');
+                    const g=document.getElementById('user-exam-grid'); g.innerHTML='';
+                    for(let i=0;i<60;i++) g.innerHTML+=`<div class="text-center"><div class="text-[10px] text-slate-400">Q${i+1}</div><select class="w-full border rounded text-center"><option>-</option><option>A</option></select></div>`;
+                }, 1000);
+            },
+            calculateRealScore: () => toast("Simulação", "success"),
+            
+            showUpgradeModal: () => document.getElementById('upgrade-modal').classList.remove('hidden'),
+            openCheckout: () => { document.getElementById('upgrade-modal').classList.add('hidden'); document.getElementById('checkout-modal').classList.remove('hidden'); },
+            closeCheckout: () => document.getElementById('checkout-modal').classList.add('hidden'),
             openComparisonModal: () => document.getElementById('comparison-modal').classList.remove('hidden'),
             closeComparisonModal: () => document.getElementById('comparison-modal').classList.add('hidden'),
             switchTab: (t) => { document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.getElementById(`tab-${t}`).classList.remove('hidden'); },
-            filterReview: () => {},
+            filterReview: (t) => { document.querySelectorAll('#review-container > div').forEach(d => { if(t==='all') d.classList.remove('hidden'); else if(t==='wrong') d.classList.contains('border-emerald-200') ? d.classList.add('hidden') : d.classList.remove('hidden'); }); },
+            showJumpMenu: () => document.getElementById('jump-menu').classList.remove('hidden'),
             closeJumpMenu: () => document.getElementById('jump-menu').classList.add('hidden'),
-            showJumpMenu: () => document.getElementById('jump-menu').classList.remove('hidden')
+            
+            openAdminLoginModal: () => document.getElementById('admin-login-modal').classList.remove('hidden'),
+            handleAdminLogin: async () => { const e=document.getElementById('admin-email').value; if(e===ADMIN_EMAIL) { document.getElementById('admin-login-modal').classList.add('hidden'); document.getElementById('admin-modal').classList.remove('hidden'); } else alert("Negado"); },
+            saveOfficialKey: () => alert("Salvo")
         };
-        
+
+        setInterval(() => {
+            const t = new Date("2025-12-21").getTime() - new Date().getTime();
+            document.getElementById('countdown-timer').innerText = t>0 ? Math.ceil(t/(1000*60*60*24))+" DIAS" : "HOJE!";
+        }, 1000);
+
         window.app = app;
     </script>
 </body>
